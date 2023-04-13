@@ -7,9 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
@@ -57,7 +55,7 @@ public class FilmController {
         if (film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
             throw new ValidationException("Длина описания не должна превышать " + MAX_DESCRIPTION_LENGTH + " символов");
         }
-        if(film.getDescription().isBlank()||film.getDescription()== null){
+        if (film.getDescription().isBlank() || film.getDescription() == null) {
             throw new ValidationException("Длина описания не должна быть пустой");
         }
 
