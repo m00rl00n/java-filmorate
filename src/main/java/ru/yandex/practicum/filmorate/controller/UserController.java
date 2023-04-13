@@ -12,12 +12,13 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @RestController
 @Validated
 public class UserController {
-    private final Map<Integer, User> usersMap = new HashMap<>();
+    private final ConcurrentHashMap<Integer, User> usersMap = new ConcurrentHashMap<>();
     private int idUser = 0;
 
     @PostMapping(value = "/users")
@@ -51,14 +52,14 @@ public class UserController {
     }
 
     public void validateUser(User user) {
-        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")) {
+        if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@")||user.getEmail().isBlank()) {
             throw new ValidationException("Email должен быть заполнен и содержать символ @");
-        } else if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")) {
+        } else if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().contains(" ")||user.getLogin().isBlank()) {
             throw new ValidationException("Логин не должен быть пустым и содержать пробелы");
         } else if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             throw new ValidationException("Дата рождения не может быть в будущем");
         }
-        if (user.getName() == null || user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isEmpty()|| user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }

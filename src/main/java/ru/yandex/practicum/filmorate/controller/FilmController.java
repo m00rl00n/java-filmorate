@@ -10,12 +10,13 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @Slf4j
 public class FilmController {
     private int idFilm = 0;
-    private final Map<Integer, Film> filmsMap = new HashMap<>();
+    private final ConcurrentHashMap<Integer, Film> filmsMap = new ConcurrentHashMap<>();
 
     @PostMapping(value = "/films")
     public Film addFilm(@Valid @RequestBody Film film) {
@@ -45,12 +46,19 @@ public class FilmController {
     public void validateFilm(Film film) {
         final int MAX_DESCRIPTION_LENGTH = 200;
 
-        if (film.getName().isEmpty()) {
+        if (film == null) {
+            throw new ValidationException("Фильм не может быть null");
+        }
+
+        if (film.getName() == null || film.getName().isBlank()) {
             throw new ValidationException("Название фильма не может быть пустым");
         }
 
         if (film.getDescription().length() > MAX_DESCRIPTION_LENGTH) {
             throw new ValidationException("Длина описания не должна превышать " + MAX_DESCRIPTION_LENGTH + " символов");
+        }
+        if(film.getDescription().isBlank()||film.getDescription()== null){
+            throw new ValidationException("Длина описания не должна быть пустой");
         }
 
         if (film.getDuration() <= 0) {
