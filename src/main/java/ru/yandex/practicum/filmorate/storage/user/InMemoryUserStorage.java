@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -44,7 +43,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> getUsers() {
-            return List.copyOf(usersMap.values());
+        return List.copyOf(usersMap.values());
 
     }
 
@@ -59,7 +58,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<Integer> getFriends(Integer id) {
-        return  new ArrayList<>(usersMap.get(id).getFriends());
+        return new ArrayList<>(usersMap.get(id).getFriends());
     }
 
     @Override

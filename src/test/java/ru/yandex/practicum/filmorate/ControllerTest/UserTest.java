@@ -22,7 +22,7 @@ public class UserTest {
 
     @Test
     void testAddUser() {
-        User user = new User(1, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1),new HashSet<>());
+        User user = new User(1, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
 
         User addedUser = userController.addUser(user);
         assertEquals(user, addedUser);
@@ -30,7 +30,7 @@ public class UserTest {
 
     @Test
     void testUpdateUser() {
-        User user = new User(1, "test@1.com", "логин", "имя!!!", LocalDate.of(2013, 9, 1),new HashSet<>());
+        User user = new User(1, "test@1.com", "логин", "имя!!!", LocalDate.of(2013, 9, 1), new HashSet<>());
         ;
         User updatedUser = userController.updateUser(user);
         assertEquals(user, updatedUser);
@@ -38,8 +38,8 @@ public class UserTest {
 
     @Test
     void testGetAllUser() {
-        User user1 = new User(1, "test@1.com", "логин", "имя111", LocalDate.of(2013, 9, 1),new HashSet<>());
-        User user2 = new User(1, "test@1.com", "логин", "имя222", LocalDate.of(2013, 9, 1),new HashSet<>());
+        User user1 = new User(1, "test@1.com", "логин", "имя111", LocalDate.of(2013, 9, 1), new HashSet<>());
+        User user2 = new User(1, "test@1.com", "логин", "имя222", LocalDate.of(2013, 9, 1), new HashSet<>());
         userController.addUser(user1);
         userController.addUser(user2);
         List<User> userList = userController.getAllUsers();
@@ -50,11 +50,11 @@ public class UserTest {
 
     @Test
     void testEmailValidation() {
-        User user = new User(1, "test1.com", "логин", "имя", LocalDate.of(2013, 9, 1),new HashSet<>());
+        User user = new User(1, "test1.com", "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
         assertThrows(ValidationException.class, () -> {
             userController.addUser(user);
         });
-        User user1 = new User(1, null, "логин", "имя", LocalDate.of(2013, 9, 1),new HashSet<>());
+        User user1 = new User(1, null, "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
         assertThrows(ValidationException.class, () -> {
             userController.addUser(user1);
         });
@@ -62,11 +62,11 @@ public class UserTest {
 
     @Test
     void testLoginValidation() {
-        User user = new User(1, "test@1.com", " vv  v", "имя", LocalDate.of(2013, 9, 1) ,new HashSet<>());
+        User user = new User(1, "test@1.com", " vv  v", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
         assertThrows(ValidationException.class, () -> {
             userController.addUser(user);
         });
-        User user2 = new User(1, "test@1.com", null, "имя", LocalDate.of(2013, 9, 1),new HashSet<>());
+        User user2 = new User(1, "test@1.com", null, "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
         assertThrows(ValidationException.class, () -> {
             userController.addUser(user2);
         });
@@ -74,22 +74,23 @@ public class UserTest {
 
     @Test
     void testNameValidation() {
-        User user = new User(1, "test@1.com", "логин", "", LocalDate.of(2013, 9, 1),new HashSet<>());
+        User user = new User(1, "test@1.com", "логин", "", LocalDate.of(2013, 9, 1), new HashSet<>());
         userController.addUser(user);
         assertEquals(user.getLogin(), user.getName());
     }
 
     @Test
     void testBirthday() {
-        User user = new User(1, "test@1.com", "логин", "", LocalDate.now().plusDays(1),new HashSet<>());
+        User user = new User(1, "test@1.com", "логин", "", LocalDate.now().plusDays(1), new HashSet<>());
         assertThrows(ValidationException.class, () -> {
             userController.addUser(user);
         });
     }
+
     @Test
     void testAddFriend() {
-        User user1 = new User(1, "test@1.com", "логин1", "имя1", LocalDate.of(2013, 9, 1),new HashSet<>());
-        User user2 = new User(2, "test@2.com", "логин2", "имя2", LocalDate.of(2013, 9, 2),new HashSet<>());
+        User user1 = new User(1, "test@1.com", "логин1", "имя1", LocalDate.of(2013, 9, 1), new HashSet<>());
+        User user2 = new User(2, "test@2.com", "логин2", "имя2", LocalDate.of(2013, 9, 2), new HashSet<>());
         userController.addUser(user1);
         userController.addUser(user2);
         userController.addFriend(user1.getId(), user2.getId());
@@ -100,8 +101,8 @@ public class UserTest {
 
     @Test
     void testRemoveFriend() {
-        User user1 = new User(1, "test@1.com", "логин1", "имя1", LocalDate.of(2013, 9, 1),new HashSet<>());
-        User user2 = new User(2, "test@2.com", "логin2", "имя2", LocalDate.of(2013, 9, 2),new HashSet<>());
+        User user1 = new User(1, "test@1.com", "логин1", "имя1", LocalDate.of(2013, 9, 1), new HashSet<>());
+        User user2 = new User(2, "test@2.com", "логin2", "имя2", LocalDate.of(2013, 9, 2), new HashSet<>());
         userController.addUser(user1);
         userController.addUser(user2);
         userController.addFriend(user1.getId(), user2.getId());

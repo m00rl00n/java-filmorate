@@ -20,18 +20,23 @@ public class FilmService {
     public FilmService(FilmStorage filmStorage, UserService userService) {
         this.filmStorage = filmStorage;
     }
-    public Film addFilm(Film film){
-       return filmStorage.addFilm(film);
+
+    public Film addFilm(Film film) {
+        return filmStorage.addFilm(film);
     }
-    public Film updateFilm(Film film){
+
+    public Film updateFilm(Film film) {
         return filmStorage.updateFilm(film);
     }
-    public Film getFilm(Integer id){
+
+    public Film getFilm(Integer id) {
         return filmStorage.getFilm(id);
     }
-    public List<Film> getAllFilm(){
+
+    public List<Film> getAllFilm() {
         return filmStorage.getAllFilm();
     }
+
     public Film addLike(Film film, int userId) {
         Film filmLike = filmStorage.getFilm(film.getId());
         filmLike.addLike(userId);
@@ -43,13 +48,12 @@ public class FilmService {
         film.removeLike(userId);
         return film;
     }
+
     public List<Film> getMostLikedFilms() {
         List<Film> allFilms = filmStorage.getAllFilm();
         Collections.sort(allFilms, (f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()));
         return allFilms.subList(0, Math.min(allFilms.size(), 10));
     }
-
-
 
 
 }

@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.validation.ValidationException;
 
 @Component
 @Slf4j
@@ -47,13 +46,12 @@ public class InMemoryFilmStorage implements FilmStorage {
     public List<Film> getAllFilm() {
         return List.copyOf(filmsMap.values());
     }
+
     @Override
     public Film deleteFilm(Film film) {
         filmsMap.remove(film.getId());
         return film;
     }
-
-
 
 
     public void validateFilm(Film film) {

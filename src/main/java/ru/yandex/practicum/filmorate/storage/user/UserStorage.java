@@ -7,9 +7,14 @@ import java.util.List;
 
 public interface UserStorage {
     User addUser(User user);
+
     User updateUser(User user);
+
     List<User> getUsers();
+
     User getUser(Integer userId);
+
     User deleteUser(User user);
-   List<Integer> getFriends(Integer id);
+
+    List<Integer> getFriends(Integer id);
 }

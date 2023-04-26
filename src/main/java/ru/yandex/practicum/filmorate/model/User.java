@@ -6,9 +6,6 @@ import lombok.NonNull;
 import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -22,19 +19,20 @@ public class User {
     private String name;
     private LocalDate birthday;
     private Set<Integer> friends;
+
     public void addFriend(Integer friend) {
         if (friend == null) {
             throw new IncorrectParameterException("ID не может быть нулевым");
         }
         if (friends.contains(friend)) {
-            throw new  IncorrectParameterException("Данный пользователь уже является другом");
+            throw new IncorrectParameterException("Данный пользователь уже является другом");
         }
         friends.add(friend);
     }
 
     public void removeFriend(Integer friend) {
         if (friend == null) {
-            throw new  IncorrectParameterException("ID не может быть нулевым");
+            throw new IncorrectParameterException("ID не может быть нулевым");
         }
         if (!friends.contains(friend)) {
             throw new NotFoundException("Пользователь с id " + friend + " не является другом");
