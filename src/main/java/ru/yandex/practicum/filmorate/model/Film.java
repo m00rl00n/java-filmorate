@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NonNull;
 import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
