@@ -2,9 +2,10 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.ValidationException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User updateUser(User user) {
         if (!usersMap.containsKey(user.getId())) {
-            throw new ValidationException("Пользователь не зарегистрирован");
+            throw new NotFoundException("Пользователь не зарегистрирован");
         }
         validateUser(user);
         usersMap.put(user.getId(), user);
@@ -50,7 +51,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User getUser(Integer userId) {
         if (!usersMap.containsKey(userId)) {
-            throw new ValidationException("Пользователь не найден.");
+            throw new NotFoundException("Пользователь не найден.");
         }
         return usersMap.get(userId);
     }
@@ -58,7 +59,19 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<Integer> getFriends(Integer id) {
-        return new ArrayList<>(usersMap.get(id).getFriends());
+        User user = usersMap.get(id);
+        if (user == null) {
+            throw new NotFoundException("Пользователь не найден.");
+        }
+        if (user.getFriends() == null) {
+            throw new NotFoundException("Список друзей пользователя не найден.");
+        }
+        return new ArrayList<>(user.getFriends());
+    }
+
+    @Override
+    public ConcurrentHashMap<Integer, User> getMap() {
+        return usersMap;
     }
 
     @Override

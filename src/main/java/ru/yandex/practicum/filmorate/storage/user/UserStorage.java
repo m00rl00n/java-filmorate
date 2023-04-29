@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface UserStorage {
     User addUser(User user);
@@ -17,4 +18,6 @@ public interface UserStorage {
     User deleteUser(User user);
 
     List<Integer> getFriends(Integer id);
+
+    ConcurrentHashMap<Integer, User> getMap();
 }
