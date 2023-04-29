@@ -92,4 +92,7 @@ public class InMemoryUserStorage implements UserStorage {
             user.setName(user.getLogin());
         }
     }
+    public void resetIdUser(){
+        idUser=0;
+    }
 }
