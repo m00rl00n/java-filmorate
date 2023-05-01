@@ -92,7 +92,7 @@ public class UserTest {
         userController.addUser(user1);
         userController.addUser(user2);
         userController.addFriend(user1.getId(), user2.getId());
-        List<Integer> friends = userController.getFriends(user1.getId());
+        List<User> friends = userController.getFriends(user1.getId());
         assertEquals(1, friends.size());
         assertEquals(user2.getId(), friends.get(0));
     }
@@ -105,7 +105,7 @@ public class UserTest {
         userController.addUser(user2);
         userController.addFriend(user1.getId(), user2.getId());
         userController.removeFriend(user1.getId(), user2.getId());
-        List<Integer> friends = userController.getFriends(user1.getId());
+        List<User> friends = userController.getFriends(user1.getId());
         assertEquals(0, friends.size());
     }
     @Test
@@ -127,7 +127,7 @@ public class UserTest {
         userController.addFriend(user1.getId(), user2.getId());
         userController.addFriend(user2.getId(), user3.getId());
         userController.addFriend(user1.getId(), user3.getId());
-        List<Integer> commonFriends = userController.getCommonFriends(user1.getId(), user2.getId());
+        List<User> commonFriends = userController.getCommonFriends(user1.getId(), user2.getId());
         assertEquals(1, commonFriends.size());
         assertTrue(commonFriends.contains(user3.getId()));
     }
@@ -151,7 +151,7 @@ public class UserTest {
         userController.addUser(user1);
         userController.addUser(user2);
         userController.addFriend(user1.getId(), user2.getId());
-        List<Integer> friends = userController.getFriends(user1.getId());
+        List<User> friends = userController.getFriends(user1.getId());
         assertEquals(1, friends.size());
         assertEquals(user2.getId(), friends.get(0));
     }

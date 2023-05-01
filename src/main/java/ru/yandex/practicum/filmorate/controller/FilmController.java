@@ -41,7 +41,7 @@ public class FilmController {
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    public Film setLike(@PathVariable int id, @PathVariable int userId) {
+    public Film updateFilm(@PathVariable int id, @PathVariable int userId) {
         return filmService.addLike(filmService.getFilm(id), userId);
     }
 
@@ -51,8 +51,8 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> getPopularFilms() {
-        return filmService.getMostLikedFilms();
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
+        return filmService.getMostPopular(count);
     }
 }
 
