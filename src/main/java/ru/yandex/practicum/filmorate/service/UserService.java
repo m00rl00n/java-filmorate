@@ -71,8 +71,8 @@ public class UserService {
 
         List<User> friends = new ArrayList<>();
         Set<Integer> friendId = user.getFriends();
-        for (Integer ID : friendId) {
-            User friend = userStorage.getUser(id);
+        for (Integer idFriend : friendId) {
+            User friend = userStorage.getUser(idFriend);
             if (friend != null) {
                 friends.add(friend);
             }
