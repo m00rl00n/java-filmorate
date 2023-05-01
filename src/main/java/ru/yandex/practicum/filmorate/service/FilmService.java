@@ -1,55 +1,69 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+
 
 public class FilmService {
     private final FilmStorage filmStorage;
 
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserService userService) {
+    public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
-    public Film addFilm(Film film){
-       return filmStorage.addFilm(film);
+
+    public Film addFilm(Film film) {
+        return filmStorage.addFilm(film);
     }
-    public Film updateFilm(Film film){
+
+    public Film updateFilm(Film film) {
         return filmStorage.updateFilm(film);
     }
-    public Film getFilm(Integer id){
+
+    public Film getFilm(Integer id) {
         return filmStorage.getFilm(id);
     }
-    public List<Film> getAllFilm(){
+
+    public List<Film> getAllFilm() {
         return filmStorage.getAllFilm();
     }
+
     public Film addLike(Film film, int userId) {
-        Film filmLike = filmStorage.getFilm(film.getId());
-        filmLike.addLike(userId);
-        return filmLike;
+        Film filmNew = filmStorage.getFilm(film.getId());
+        if (filmNew == null) {
+            throw new NotFoundException("Фильм не найден");
+        }
+        filmNew.addLike(userId);
+        return filmStorage.updateFilm(filmNew);
     }
 
     public Film removeLike(int id, int userId) {
         Film film = filmStorage.getFilm(id);
+        if (film == null) {
+            throw new NotFoundException("Фильм не найден");
+        }
         film.removeLike(userId);
-        return film;
-    }
-    public List<Film> getMostLikedFilms() {
-        List<Film> allFilms = filmStorage.getAllFilm();
-        Collections.sort(allFilms, (f1, f2) -> Integer.compare(f2.getLikes().size(), f1.getLikes().size()));
-        return allFilms.subList(0, Math.min(allFilms.size(), 10));
+        return filmStorage.updateFilm(film);
     }
 
-
+    public List<Film> getMostPopular(int max) {
+        if (max == 0) {
+            max = 10;
+        }
+        List<Film> films = new ArrayList<>(filmStorage.getMapFilms().values());
+        films.sort(Comparator.comparingInt(film -> film.getLikes().size() * (-1)));
+        return films.subList(0, Math.min(films.size(), max));
+    }
 
 
 }

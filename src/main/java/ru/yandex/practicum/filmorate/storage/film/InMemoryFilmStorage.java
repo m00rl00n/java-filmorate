@@ -1,16 +1,18 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-
-import javax.validation.ValidationException;
 
 @Component
+@Getter
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
 
@@ -40,20 +42,31 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Integer id) {
+        if (!filmsMap.containsKey(id)) {
+            throw new NotFoundException("Фильма с id " + id + " нет в базе");
+        }
         return filmsMap.get(id);
     }
+
 
     @Override
     public List<Film> getAllFilm() {
         return List.copyOf(filmsMap.values());
     }
+
     @Override
     public Film deleteFilm(Film film) {
+        if (!filmsMap.containsKey(film.getId())) {
+            throw new NotFoundException("Фильма нет в базе, невозможно удалить");
+        }
         filmsMap.remove(film.getId());
         return film;
     }
 
-
+    @Override
+    public ConcurrentHashMap<Integer, Film> getMapFilms() {
+        return filmsMap;
+    }
 
 
     public void validateFilm(Film film) {

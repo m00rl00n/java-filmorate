@@ -6,11 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
-import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.time.LocalDate;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @Slf4j
@@ -45,7 +41,7 @@ public class FilmController {
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    public Film setLike(@PathVariable int id, @PathVariable int userId) {
+    public Film updateFilm(@PathVariable int id, @PathVariable int userId) {
         return filmService.addLike(filmService.getFilm(id), userId);
     }
 
@@ -55,8 +51,8 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> getPopularFilms() {
-        return filmService.getMostLikedFilms();
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
+        return filmService.getMostPopular(count);
     }
 }
 
