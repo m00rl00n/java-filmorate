@@ -28,6 +28,7 @@ public class UserTest {
     void resetIdUser() {
         inMemoryUserStorage.resetIdUser();
     }
+
     @Test
     void testAddUser() {
         User user = new User(1, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
@@ -39,11 +40,9 @@ public class UserTest {
     @Test
     void testUpdateUser() {
         User user = new User(1, "test@1.com", "логин", "имя!!!", LocalDate.of(2013, 9, 1), new HashSet<>());
-        ;
         User updatedUser = userController.updateUser(user);
         assertEquals(user, updatedUser);
     }
-
 
 
     @Test
@@ -108,6 +107,7 @@ public class UserTest {
         List<User> friends = userController.getFriends(user1.getId());
         assertEquals(0, friends.size());
     }
+
     @Test
     void testGetUser() {
         User user = new User(1, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
