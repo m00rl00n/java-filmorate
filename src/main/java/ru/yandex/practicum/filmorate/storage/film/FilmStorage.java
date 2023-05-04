@@ -18,4 +18,6 @@ public interface FilmStorage {
 
     ConcurrentHashMap<Integer, Film> getMapFilms();
 
+    public List<Film> sortByLikes(List<Film> films, int max);
+
 }

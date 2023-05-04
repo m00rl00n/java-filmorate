@@ -53,6 +53,10 @@ public class InMemoryUserStorage implements UserStorage {
         if (!usersMap.containsKey(id)) {
             throw new NotFoundException("Пользователь не найден.");
         }
+        if (usersMap.get(id) == null) {
+            throw new NotFoundException("Пользователь с id " + id + " не найден");
+        }
+
         return usersMap.get(id);
     }
 
@@ -72,6 +76,13 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public ConcurrentHashMap<Integer, User> getMap() {
         return usersMap;
+    }
+
+    @Override
+    public void checkCommonFriends(Integer idUser, Integer idFriends) {
+        if (!usersMap.get(idUser).getFriends().contains(idFriends) || !usersMap.get(idFriends).getFriends().contains(idUser)) {
+            throw new IllegalArgumentException("Пользователи не являются друзьями");
+        }
     }
 
     @Override

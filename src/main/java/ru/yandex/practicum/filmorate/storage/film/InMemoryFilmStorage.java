@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -45,6 +47,9 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (!filmsMap.containsKey(id)) {
             throw new NotFoundException("Фильма с id " + id + " нет в базе");
         }
+        if (filmsMap.get(id) == null) {
+            throw new NotFoundException("Фильм не найден");
+        }
         return filmsMap.get(id);
     }
 
@@ -66,6 +71,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public ConcurrentHashMap<Integer, Film> getMapFilms() {
         return filmsMap;
+    }
+
+    @Override
+    public List<Film> sortByLikes(List<Film> films, int max) {
+        List<Film> sortedFilms = new ArrayList<>(films);
+        sortedFilms.sort(Comparator.comparingInt(film -> film.getLikes().size() * (-1)));
+        return sortedFilms.subList(0, Math.min(sortedFilms.size(), max));
     }
 
 

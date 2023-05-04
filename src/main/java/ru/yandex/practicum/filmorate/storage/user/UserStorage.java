@@ -20,4 +20,6 @@ public interface UserStorage {
     List<Integer> getFriends(Integer id);
 
     ConcurrentHashMap<Integer, User> getMap();
+
+    void checkCommonFriends(Integer idUser, Integer idFriends);
 }
