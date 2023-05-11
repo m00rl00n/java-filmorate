@@ -11,7 +11,7 @@ SELECT *
 FROM Film 
 ORDER BY releaseDate;
 
-2.Получить список друзей пользователя с определенным id:
+2. Получить список друзей пользователя с определенным id:
 SELECT User.* 
 FROM User JOIN Friends ON User.id_user = Friends.id_friend 
 WHERE Friends.id_user = {user_id};
