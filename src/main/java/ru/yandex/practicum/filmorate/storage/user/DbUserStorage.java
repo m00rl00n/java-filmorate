@@ -25,6 +25,7 @@ public class DbUserStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
     private final UserMapper userMapper;
+
     @Autowired
     public DbUserStorage(JdbcTemplate jdbcTemplate, UserMapper userMapper) {
         this.jdbcTemplate = jdbcTemplate;

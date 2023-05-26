@@ -28,6 +28,7 @@ public class DbFilmStorage implements FilmStorage {
     JdbcTemplate jdbcTemplate;
     FilmMapper filmMapper;
     DbUserStorage dbUserStorage;
+
     @Autowired
     public DbFilmStorage(JdbcTemplate jdbcTemplate, FilmMapper filmMapper, DbUserStorage dbUserStorage) {
         this.jdbcTemplate = jdbcTemplate;
