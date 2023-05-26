@@ -20,6 +20,7 @@ public class Film {
     private Integer duration;
     private Set<Genre> genres;
     private Mpa mpa;
+
     public Film(Integer id, String name, String description, LocalDate releaseDate,
                 Integer duration, Set<Genre> genres, Mpa mpa) {
         this.id = id;
