@@ -1,4 +1,7 @@
 *.class
+*.jar
+*.DS_Store
+*.class
 *.log
 *.jar
 *.war
