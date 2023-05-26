@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.Data;
+
 import java.util.Objects;
 
 
@@ -8,13 +9,12 @@ import java.util.Objects;
 
 public class Mpa {
     private Integer id;
+    private String name;
 
     public Mpa(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
-
-    private String name;
 
     @Override
     public boolean equals(Object obj) {

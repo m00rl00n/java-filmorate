@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.storage.user;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.PreparedStatement;
@@ -22,15 +23,13 @@ import java.util.List;
 @Slf4j
 public class DbUserStorage implements UserStorage {
 
+    private final JdbcTemplate jdbcTemplate;
+    private final UserMapper userMapper;
     @Autowired
     public DbUserStorage(JdbcTemplate jdbcTemplate, UserMapper userMapper) {
         this.jdbcTemplate = jdbcTemplate;
         this.userMapper = userMapper;
     }
-
-    private final JdbcTemplate jdbcTemplate;
-    private final UserMapper userMapper;
-
 
     @Override
     public User addUser(User user) {
@@ -95,7 +94,7 @@ public class DbUserStorage implements UserStorage {
     public void deleteUser(Integer userId) {
         getUser(userId);
         String sql = "DELETE FROM users WHERE id = ?";
-        jdbcTemplate.update(sql,userId);
+        jdbcTemplate.update(sql, userId);
         log.info("Пользователь с айди " + userId + " удален");
     }
 
@@ -104,7 +103,7 @@ public class DbUserStorage implements UserStorage {
         getUser(userId);
         getUser(friendId);
         String sql = "INSERT INTO friends (id_user, friend_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql,userId, friendId);
+        jdbcTemplate.update(sql, userId, friendId);
         log.info("Друг добавлен");
     }
 
@@ -136,6 +135,7 @@ public class DbUserStorage implements UserStorage {
                 "AND f.friend_id IN (SELECT friend_id FROM friends WHERE id_user = ?)";
         return jdbcTemplate.query(sql, userMapper, userId, otherId);
     }
+
     public void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty() || !user.getEmail().contains("@") || user.getEmail().isBlank()) {
             throw new ValidationException("Email должен быть заполнен и содержать символ @");

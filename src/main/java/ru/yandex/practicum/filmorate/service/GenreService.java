@@ -10,13 +10,13 @@ import java.util.List;
 @Service
 public class GenreService {
 
+    DbGenreStorage dbGenreStorage;
+
+
     @Autowired
     public GenreService(DbGenreStorage dbGenreStorage) {
         this.dbGenreStorage = dbGenreStorage;
     }
-
-
-    DbGenreStorage dbGenreStorage;
 
     public List<Genre> getAllGenres() {
         return dbGenreStorage.getAllGenres();

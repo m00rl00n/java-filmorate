@@ -25,17 +25,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DbFilmStorage implements FilmStorage {
 
+    JdbcTemplate jdbcTemplate;
+    FilmMapper filmMapper;
+    DbUserStorage dbUserStorage;
     @Autowired
     public DbFilmStorage(JdbcTemplate jdbcTemplate, FilmMapper filmMapper, DbUserStorage dbUserStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmMapper = filmMapper;
         this.dbUserStorage = dbUserStorage;
     }
-
-    JdbcTemplate jdbcTemplate;
-    FilmMapper filmMapper;
-    DbUserStorage dbUserStorage;
-
 
     @Override
     public Film addFilm(Film film) {

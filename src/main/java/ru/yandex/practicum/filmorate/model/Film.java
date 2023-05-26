@@ -11,12 +11,15 @@ import java.util.Set;
 
 @Data
 public class Film {
+    @JsonIgnore
+    private final Set<Long> likes = new HashSet<>();
     private Integer id;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
-
+    private Set<Genre> genres;
+    private Mpa mpa;
     public Film(Integer id, String name, String description, LocalDate releaseDate,
                 Integer duration, Set<Genre> genres, Mpa mpa) {
         this.id = id;
@@ -27,11 +30,6 @@ public class Film {
         this.genres = genres;
         this.mpa = mpa;
     }
-
-    private Set<Genre> genres;
-    private Mpa mpa;
-    @JsonIgnore
-    private final Set<Long> likes = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
