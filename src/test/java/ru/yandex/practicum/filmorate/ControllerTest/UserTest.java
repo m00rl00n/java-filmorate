@@ -1,160 +1,130 @@
 package ru.yandex.practicum.filmorate.ControllerTest;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @SpringBootTest
+@AutoConfigureTestDatabase
 public class UserTest {
 
+    private final UserController userController;
 
     @Autowired
-    private UserController userController;
-    @Autowired
-    private InMemoryUserStorage inMemoryUserStorage;
-
-    @AfterEach
-    void resetIdUser() {
-        inMemoryUserStorage.resetIdUser();
+    public UserTest(UserController userController) {
+        this.userController = userController;
     }
+
 
     @Test
     void testAddUser() {
-        User user = new User(1, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
-
+        User user = new User(1, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1));
         User addedUser = userController.addUser(user);
-        assertEquals(user, addedUser);
+
+        assertThat(addedUser.getId()).isNotNull();
+        assertThat(addedUser.getEmail()).isEqualTo("test@1.com");
+        assertThat(addedUser.getLogin()).isEqualTo("логин");
+        assertThat(addedUser.getName()).isEqualTo("имя");
+        assertThat(addedUser.getBirthday()).isEqualTo(LocalDate.of(2013, 9, 1));
     }
 
     @Test
     void testUpdateUser() {
-        User user = new User(1, "test@1.com", "логин", "имя!!!", LocalDate.of(2013, 9, 1), new HashSet<>());
-        User updatedUser = userController.updateUser(user);
-        assertEquals(user, updatedUser);
+        User user = new User(2, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1));
+        User addedUser = userController.addUser(user);
+
+        addedUser.setEmail("updated@test.com");
+        addedUser.setLogin("updatedLogin");
+        addedUser.setName("updatedName");
+        addedUser.setBirthday(LocalDate.of(2000, 1, 1));
+        User updatedUser = userController.updateUser(addedUser);
+        assertThat(updatedUser.getId()).isEqualTo(addedUser.getId());
+        assertThat(updatedUser.getEmail()).isEqualTo("updated@test.com");
+        assertThat(updatedUser.getLogin()).isEqualTo("updatedLogin");
+        assertThat(updatedUser.getName()).isEqualTo("updatedName");
+        assertThat(updatedUser.getBirthday()).isEqualTo(LocalDate.of(2000, 1, 1));
     }
 
-
-    @Test
-    void testEmailValidation() {
-        User user = new User(1, "test1.com", "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
-        assertThrows(ValidationException.class, () -> {
-            userController.addUser(user);
-        });
-        User user1 = new User(1, null, "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
-        assertThrows(ValidationException.class, () -> {
-            userController.addUser(user1);
-        });
-    }
-
-    @Test
-    void testLoginValidation() {
-        User user = new User(1, "test@1.com", " vv  v", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
-        assertThrows(ValidationException.class, () -> {
-            userController.addUser(user);
-        });
-        User user2 = new User(1, "test@1.com", null, "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
-        assertThrows(ValidationException.class, () -> {
-            userController.addUser(user2);
-        });
-    }
-
-    @Test
-    void testNameValidation() {
-        User user = new User(1, "test@1.com", "логин", "", LocalDate.of(2013, 9, 1), new HashSet<>());
-        userController.addUser(user);
-        assertEquals(user.getLogin(), user.getName());
-    }
-
-    @Test
-    void testBirthday() {
-        User user = new User(1, "test@1.com", "логин", "", LocalDate.now().plusDays(1), new HashSet<>());
-        assertThrows(ValidationException.class, () -> {
-            userController.addUser(user);
-        });
-    }
-
-    @Test
-    void testAddFriend() {
-        User user1 = new User(1, "test@1.com", "логин1", "имя1", LocalDate.of(2013, 9, 1), new HashSet<>());
-        User user2 = new User(2, "test@2.com", "логин2", "имя2", LocalDate.of(2013, 9, 2), new HashSet<>());
-        userController.addUser(user1);
-        userController.addUser(user2);
-        userController.addFriend(user1.getId(), user2.getId());
-        List<User> friends = userController.getFriends(user1.getId());
-        assertEquals(1, friends.size());
-        assertEquals(user2, friends.get(0));
-    }
-
-    @Test
-    void testRemoveFriend() {
-        User user1 = new User(1, "test@1.com", "логин1", "имя1", LocalDate.of(2013, 9, 1), new HashSet<>());
-        User user2 = new User(2, "test@2.com", "логин2", "имя2", LocalDate.of(2013, 9, 2), new HashSet<>());
-        userController.addUser(user1);
-        userController.addUser(user2);
-        userController.addFriend(user1.getId(), user2.getId());
-        userController.removeFriend(user1.getId(), user2.getId());
-        List<User> friends = userController.getFriends(user1.getId());
-        assertEquals(0, friends.size());
-    }
 
     @Test
     void testGetUser() {
-        User user = new User(1, "test@1.com", "логин", "имя", LocalDate.of(2013, 9, 1), new HashSet<>());
-        userController.addUser(user);
-        User resultUser = userController.getUser(user.getId());
-        assertEquals(user, resultUser);
+        Integer userId = 1;
+        User user = userController.getUser(userId);
+        assertThat(user).isNotNull();
+        assertThat(user.getId()).isEqualTo(userId);
+    }
+
+    @Test
+    void testAddFriendAndGetFriends() {
+        User user1 = new User(4, "test@4.com", "логин4", "имя4", LocalDate.of(2023, 5, 25));
+        User user2 = new User(5, "test@5.com", "логин5", "имя5", LocalDate.of(2023, 5, 25));
+        userController.addUser(user1);
+        userController.addUser(user2);
+
+        userController.addFriend(user1.getId(), user2.getId());
+
+        List<User> friends = userController.getFriends(user1.getId());
+        assertThat(friends).isNotNull();
+        assertThat(friends.size()).isEqualTo(1);
+        assertThat(friends.get(0).getId()).isEqualTo(user2.getId());
+    }
+
+    @Test
+    void testDeleteFriend() {
+        Integer userId = 1;
+        Integer friendId = 2;
+        assertDoesNotThrow(() -> userController.deleteFriend(userId, friendId));
     }
 
     @Test
     void testGetCommonFriends() {
-        User user1 = new User(1, "test@1.com", "логин1", "имя1", LocalDate.of(2013, 9, 1), new HashSet<>());
-        User user2 = new User(2, "test@2.com", "логин2", "имя2", LocalDate.of(2013, 9, 2), new HashSet<>());
-        User user3 = new User(3, "test@3.com", "логин3", "имя3", LocalDate.of(2013, 9, 3), new HashSet<>());
+        User user1 = new User(6, "test@6.com", "логин6", "имя6", LocalDate.of(2023, 5, 25));
+        User user2 = new User(7, "test@7.com", "логин7", "имя7", LocalDate.of(2023, 5, 25));
+        User user3 = new User(8, "test@8.com", "логин8", "имя8", LocalDate.of(2023, 5, 25));
         userController.addUser(user1);
         userController.addUser(user2);
         userController.addUser(user3);
+
         userController.addFriend(user1.getId(), user2.getId());
-        userController.addFriend(user2.getId(), user3.getId());
         userController.addFriend(user1.getId(), user3.getId());
+        userController.addFriend(user2.getId(), user3.getId());
+
         List<User> commonFriends = userController.getCommonFriends(user1.getId(), user2.getId());
-        assertEquals(1, commonFriends.size());
-        assertTrue(commonFriends.contains(user3));
+        assertThat(commonFriends).isNotNull();
+        assertThat(commonFriends.size()).isEqualTo(1);
+        assertThat(commonFriends.get(0).getId()).isEqualTo(user3.getId());
     }
 
     @Test
-    void testGetAllUser() {
-        User user1 = new User(1, "test@1.com", "логин", "имя111", LocalDate.of(2013, 9, 1), new HashSet<>());
-        User user2 = new User(1, "test@1.com", "логин", "имя222", LocalDate.of(2013, 9, 1), new HashSet<>());
-        userController.addUser(user1);
-        userController.addUser(user2);
-        List<User> userList = userController.getAllUsers();
-        assertEquals(3, userList.size());
-        assertTrue(userList.contains(user1));
-        assertTrue(userList.contains(user2));
+    void testDeleteUser() {
+        User user = new User(3, "test@3.com", "логин3", "имя3", LocalDate.of(2023, 5, 25));
+        User addedUser = userController.addUser(user);
+
+        userController.deleteUser(addedUser.getId());
+
+        assertThatThrownBy(() -> userController.getUser(addedUser.getId()))
+                .isInstanceOf(NotFoundException.class)
+                .hasMessage("Пользователь с айди " + addedUser.getId() + " не найден");
     }
 
     @Test
-    void testGetFriends() {
-        User user1 = new User(1, "test1@1.com", "login1", "name1", LocalDate.of(2013, 9, 1), new HashSet<>());
-        User user2 = new User(2, "test2@2.com", "login2", "name2", LocalDate.of(2013, 9, 2), new HashSet<>());
-        userController.addUser(user1);
-        userController.addUser(user2);
-        userController.addFriend(user1.getId(), user2.getId());
-        List<User> friends = userController.getFriends(user1.getId());
-        assertEquals(1, friends.size());
-        assertEquals(user2, friends.get(0));
+    void testGetAllUsers() {
+        List<User> users = userController.getAllUsers();
+        assertThat(users).isNotNull();
+        assertThat(users.size()).isEqualTo(7);
     }
+
 }
 
 

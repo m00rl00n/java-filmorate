@@ -1,44 +1,55 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+
 
 @Data
 public class Film {
-
-    private int id;
+    private Integer id;
     private String name;
     private String description;
     private LocalDate releaseDate;
-    private int duration;
-    private Set<Integer> likes = new HashSet<>();
+    private Integer duration;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Set<Integer> likes) {
+    public Film(Integer id, String name, String description, LocalDate releaseDate,
+                Integer duration, Set<Genre> genres, Mpa mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        if (likes != null) {
-            this.likes.addAll(likes);
-        }
+        this.genres = genres;
+        this.mpa = mpa;
     }
 
-    public void addLike(Integer userId) {
-        if (!likes.add(userId)) {
-            throw new IncorrectParameterException("Пользователь уже лайкнул этот фильм");
-        }
+    private Set<Genre> genres;
+    private Mpa mpa;
+    @JsonIgnore
+    private final Set<Long> likes = new HashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Film film = (Film) o;
+        return Objects.equals(id, film.id) &&
+                Objects.equals(name, film.name) &&
+                Objects.equals(description, film.description) &&
+                Objects.equals(releaseDate, film.releaseDate) &&
+                Objects.equals(duration, film.duration) &&
+                Objects.equals(genres, film.genres) &&
+                Objects.equals(mpa, film.mpa);
     }
 
-    public void removeLike(Integer userId) {
-        if (!likes.remove(userId)) {
-            throw new NotFoundException("Лайк данного пользователя не найден");
-        }
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, releaseDate, duration, genres, mpa);
     }
-
 }
+
