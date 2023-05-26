@@ -3,52 +3,57 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 
 
 public class FilmService {
+    private final FilmStorage filmStorage;
 
-    DbFilmStorage dbFilmStorage;
 
     @Autowired
-    public FilmService(DbFilmStorage dbFilmStorage) {
-        this.dbFilmStorage = dbFilmStorage;
+    public FilmService(FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
     }
 
     public Film addFilm(Film film) {
-        return dbFilmStorage.addFilm(film);
+        return filmStorage.addFilm(film);
     }
 
     public Film updateFilm(Film film) {
-        return dbFilmStorage.updateFilm(film);
+        return filmStorage.updateFilm(film);
     }
 
     public Film getFilm(Integer id) {
-        return dbFilmStorage.getFilm(id);
+        return filmStorage.getFilm(id);
     }
 
     public List<Film> getAllFilm() {
-        return dbFilmStorage.getAllFilm();
+        return filmStorage.getAllFilm();
     }
 
-    public void addLike(Integer filmId, Integer userId) {
-        dbFilmStorage.likeFilm(filmId, userId);
+    public Film addLike(Film film, int userId) {
+        Film filmNew = filmStorage.getFilm(film.getId());
+        filmNew.addLike(userId);
+        return filmStorage.updateFilm(filmNew);
     }
 
-    public void removeLike(int id, int userId) {
-        dbFilmStorage.deleteLike(id, userId);
-    }
-
-    public List<Integer> getLikes(Integer count) {
-        return dbFilmStorage.getLikes(count);
+    public Film removeLike(int id, int userId) {
+        Film film = filmStorage.getFilm(id);
+        film.removeLike(userId);
+        return filmStorage.updateFilm(film);
     }
 
     public List<Film> getMostPopular(int max) {
-        return dbFilmStorage.sortByLikes(max);
+        if (max == 0) {
+            max = 10;
+        }
+        List<Film> films = new ArrayList<>(filmStorage.getMapFilms().values());
+        return filmStorage.sortByLikes(films, max);
     }
 
 
