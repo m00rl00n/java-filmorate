@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage.film;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
 public interface FilmStorage {
     Film addFilm(Film film);
@@ -14,10 +13,8 @@ public interface FilmStorage {
 
     List<Film> getAllFilm();
 
-    Film deleteFilm(Film film);
+    void deleteFilm(Film film);
 
-    ConcurrentHashMap<Integer, Film> getMapFilms();
-
-    public List<Film> sortByLikes(List<Film> films, int max);
+    List<Film> sortByLikes(int max);
 
 }
