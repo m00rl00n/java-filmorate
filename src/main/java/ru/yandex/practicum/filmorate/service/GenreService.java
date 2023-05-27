@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -8,15 +9,11 @@ import ru.yandex.practicum.filmorate.storage.film.DbGenreStorage;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class GenreService {
-
-    DbGenreStorage dbGenreStorage;
-
-
     @Autowired
-    public GenreService(DbGenreStorage dbGenreStorage) {
-        this.dbGenreStorage = dbGenreStorage;
-    }
+    private final DbGenreStorage dbGenreStorage;
+
 
     public List<Genre> getAllGenres() {
         return dbGenreStorage.getAllGenres();

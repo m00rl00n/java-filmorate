@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -7,17 +9,15 @@ import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
 
 import java.util.List;
 
+
+
 @Service
-
-
+@Slf4j
+@RequiredArgsConstructor
 public class FilmService {
-
-    DbFilmStorage dbFilmStorage;
-
     @Autowired
-    public FilmService(DbFilmStorage dbFilmStorage) {
-        this.dbFilmStorage = dbFilmStorage;
-    }
+    private  final DbFilmStorage dbFilmStorage;
+
 
     public Film addFilm(Film film) {
         return dbFilmStorage.addFilm(film);
@@ -36,10 +36,12 @@ public class FilmService {
     }
 
     public void addLike(Integer filmId, Integer userId) {
+        log.info("Добавление лайка фильму с айди " + filmId + " пользователем с айди " + userId);
         dbFilmStorage.likeFilm(filmId, userId);
     }
 
     public void removeLike(int id, int userId) {
+        log.info("Удаление лайка у фильма с айди " + id + " пользователем с айди " + userId);
         dbFilmStorage.deleteLike(id, userId);
     }
 

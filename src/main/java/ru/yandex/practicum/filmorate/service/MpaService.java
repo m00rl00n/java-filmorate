@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -8,14 +9,10 @@ import ru.yandex.practicum.filmorate.storage.film.DbMpaStorage;
 import java.util.List;
 
 @Service
-
+@RequiredArgsConstructor
 public class MpaService {
-    DbMpaStorage dbMpaStorage;
-
     @Autowired
-    public MpaService(DbMpaStorage dbMpaStorage) {
-        this.dbMpaStorage = dbMpaStorage;
-    }
+    private final DbMpaStorage dbMpaStorage;
 
     public List<Mpa> getAllMpa() {
         return dbMpaStorage.getAllMpa();

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -23,18 +24,15 @@ import java.util.stream.Collectors;
 @Component
 @Primary
 @Slf4j
+@RequiredArgsConstructor
 public class DbFilmStorage implements FilmStorage {
-
-    JdbcTemplate jdbcTemplate;
-    FilmMapper filmMapper;
-    DbUserStorage dbUserStorage;
-
     @Autowired
-    public DbFilmStorage(JdbcTemplate jdbcTemplate, FilmMapper filmMapper, DbUserStorage dbUserStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.filmMapper = filmMapper;
-        this.dbUserStorage = dbUserStorage;
-    }
+    private final JdbcTemplate jdbcTemplate;
+    @Autowired
+    private final  FilmMapper filmMapper;
+    @Autowired
+    private final DbUserStorage dbUserStorage;
+
 
     @Override
     public Film addFilm(Film film) {

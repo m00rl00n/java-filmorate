@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.mapper;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -16,19 +17,14 @@ import java.util.Set;
 
 
 @Component
-
+@RequiredArgsConstructor
 public class FilmMapper implements RowMapper<Film> {
 
     @Autowired
-    DbMpaStorage dbMpaStorage;
+    private final DbMpaStorage dbMpaStorage;
     @Autowired
-    DbGenreStorage dbGenreStorage;
+    private final DbGenreStorage dbGenreStorage;
 
-    @Autowired
-    public FilmMapper(DbMpaStorage dbMpaStorage, DbGenreStorage dbGenreStorage) {
-        this.dbMpaStorage = dbMpaStorage;
-        this.dbGenreStorage = dbGenreStorage;
-    }
 
     @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {

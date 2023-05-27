@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 @Component
 @Primary
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class DbGenreStorage implements GenreStorage {
     @Autowired
     private final JdbcTemplate jdbcTemplate;

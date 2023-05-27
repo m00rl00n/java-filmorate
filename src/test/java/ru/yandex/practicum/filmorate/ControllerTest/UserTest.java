@@ -122,7 +122,7 @@ public class UserTest {
     void testGetAllUsers() {
         List<User> users = userController.getAllUsers();
         assertThat(users).isNotNull();
-        assertThat(users.size()).isEqualTo(6);
+        assertThat(users.size()).isEqualTo(7);
     }
 
 }
