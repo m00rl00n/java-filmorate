@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 
@@ -22,6 +21,7 @@ public class Film {
     private Integer duration;
     private Set<Genre> genres;
     private Mpa mpa;
+
     public Film(Integer id, String name, String description, LocalDate releaseDate,
                 Integer duration, Set<Genre> genres, Mpa mpa) {
         this.id = id;
