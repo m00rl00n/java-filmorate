@@ -1,59 +1,56 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
 
-import java.util.ArrayList;
 import java.util.List;
 
+
+
 @Service
-
-
+@Slf4j
+@RequiredArgsConstructor
 public class FilmService {
-    private final FilmStorage filmStorage;
-
-
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-    }
+    private  final DbFilmStorage dbFilmStorage;
+
 
     public Film addFilm(Film film) {
-        return filmStorage.addFilm(film);
+        return dbFilmStorage.addFilm(film);
     }
 
     public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+        return dbFilmStorage.updateFilm(film);
     }
 
     public Film getFilm(Integer id) {
-        return filmStorage.getFilm(id);
+        return dbFilmStorage.getFilm(id);
     }
 
     public List<Film> getAllFilm() {
-        return filmStorage.getAllFilm();
+        return dbFilmStorage.getAllFilm();
     }
 
-    public Film addLike(Film film, int userId) {
-        Film filmNew = filmStorage.getFilm(film.getId());
-        filmNew.addLike(userId);
-        return filmStorage.updateFilm(filmNew);
+    public void addLike(Integer filmId, Integer userId) {
+        log.info("Добавление лайка фильму с айди " + filmId + " пользователем с айди " + userId);
+        dbFilmStorage.likeFilm(filmId, userId);
     }
 
-    public Film removeLike(int id, int userId) {
-        Film film = filmStorage.getFilm(id);
-        film.removeLike(userId);
-        return filmStorage.updateFilm(film);
+    public void removeLike(int id, int userId) {
+        log.info("Удаление лайка у фильма с айди " + id + " пользователем с айди " + userId);
+        dbFilmStorage.deleteLike(id, userId);
+    }
+
+    public List<Integer> getLikes(Integer count) {
+        return dbFilmStorage.getLikes(count);
     }
 
     public List<Film> getMostPopular(int max) {
-        if (max == 0) {
-            max = 10;
-        }
-        List<Film> films = new ArrayList<>(filmStorage.getMapFilms().values());
-        return filmStorage.sortByLikes(films, max);
+        return dbFilmStorage.sortByLikes(max);
     }
 
 

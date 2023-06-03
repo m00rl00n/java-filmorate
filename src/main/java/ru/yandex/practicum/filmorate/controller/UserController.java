@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -22,12 +21,12 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) {
+    public User addUser(@RequestBody User user) {
         return userService.addUser(user);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    public User updateUser(@RequestBody User user) {
         return userService.updateUser(user);
     }
 
@@ -42,13 +41,18 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/friends/{friendId}")
-    public User addFriend(@PathVariable("userId") Integer userId, @PathVariable("friendId") Integer friendId) {
-        return userService.addFriend(userId, friendId);
+    public void addFriend(@PathVariable("userId") Integer userId, @PathVariable("friendId") Integer friendId) {
+        userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable("userId") Integer userId) {
+        userService.deleteUser(userId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
-    public void removeFriend(@PathVariable("userId") Integer userId, @PathVariable("friendId") Integer friendId) {
-        userService.removeFriend(userId, friendId);
+    public void deleteFriend(@PathVariable("userId") Integer userId, @PathVariable("friendId") Integer friendId) {
+        userService.deleteFriend(userId, friendId);
     }
 
     @GetMapping("/{userId}/friends")
@@ -57,7 +61,8 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/friends/common/{otherId}")
-    public List<User> getCommonFriends(@PathVariable("userId") Integer userId, @PathVariable("otherId") Integer otherId) {
+    public List<User> getCommonFriends(@PathVariable("userId") Integer userId,
+                                       @PathVariable("otherId") Integer otherId) {
         return userService.getCommonFriends(userId, otherId);
     }
 }

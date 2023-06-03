@@ -8,8 +8,9 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
 
-@RestController
 @Slf4j
+@RestController
+@RequestMapping("/films")
 public class FilmController {
 
     private final FilmService filmService;
@@ -19,40 +20,45 @@ public class FilmController {
         this.filmService = filmService;
     }
 
-    @PostMapping("/films")
+    @PostMapping
     public Film addFilm(@RequestBody Film film) {
         filmService.addFilm(film);
         return filmService.getFilm(film.getId());
     }
 
-    @PutMapping("/films")
+    @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         return filmService.updateFilm(film);
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> getAllFilms() {
         return filmService.getAllFilm();
     }
 
-    @GetMapping("/films/{id}")
+    @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
         return filmService.getFilm(id);
     }
 
-    @PutMapping("/films/{id}/like/{userId}")
-    public Film updateFilm(@PathVariable int id, @PathVariable int userId) {
-        return filmService.addLike(filmService.getFilm(id), userId);
+    @PutMapping("/{id}/like/{userId}")
+    public void likeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+        filmService.addLike(id, userId);
     }
 
-    @DeleteMapping("/films/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable int id, @PathVariable int userId) {
-        return filmService.removeLike(id, userId);
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable Integer id, @PathVariable Integer userId) {
+        filmService.removeLike(id, userId);
     }
 
-    @GetMapping("/films/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "0") int count) {
+    @GetMapping("/popular")
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
         return filmService.getMostPopular(count);
+    }
+
+    @GetMapping("/{id}/like")
+    public List<Integer> getLikes(Integer count) {
+        return filmService.getLikes(count);
     }
 }
 
