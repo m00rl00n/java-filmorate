@@ -35,6 +35,10 @@ public class FilmController {
     public List<Film> getAllFilms() {
         return filmService.getAllFilm();
     }
+    @DeleteMapping
+    public void deleteFilm(@RequestBody Film film) {
+        filmService.removeFilm(film);
+    }
 
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
