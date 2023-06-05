@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -35,6 +37,7 @@ public class FilmController {
     public List<Film> getAllFilms() {
         return filmService.getAllFilm();
     }
+
     @DeleteMapping
     public void deleteFilm(@RequestBody Film film) {
         filmService.removeFilm(film);
@@ -63,6 +66,24 @@ public class FilmController {
     @GetMapping("/{id}/like")
     public List<Integer> getLikes(Integer count) {
         return filmService.getLikes(count);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getByDirectorId(@PathVariable("directorId") Integer id,
+                                      @RequestParam(required = false) String sortBy) {
+        if (sortBy != null) {
+            if (!sortBy.equals("likes") && !sortBy.equals("year")) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            sortBy = "year";
+        }
+
+        List<Film> list = filmService.getByDirectorId(id, sortBy);
+        if (list.size() == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return list;
     }
 }
 

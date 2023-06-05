@@ -17,4 +17,6 @@ public interface FilmStorage {
 
     List<Film> sortByLikes(int max);
 
+    List<Film> findByDirectorId(Integer id, String sortBy);
+
 }
