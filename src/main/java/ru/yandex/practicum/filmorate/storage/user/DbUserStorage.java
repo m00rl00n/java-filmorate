@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
@@ -35,9 +35,6 @@ public class DbUserStorage implements UserStorage {
         validateUser(user);
         if (user == null) {
             throw new ValidationException("Нужно добавить пользователя");
-        }
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
         }
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sql = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
@@ -79,24 +76,27 @@ public class DbUserStorage implements UserStorage {
 
     }
 
+
     @Override
-    public User getUser(Integer userId) {
-        try {
-            String sql = "select * from users where  id = ?";
-            return jdbcTemplate.queryForObject(sql, userMapper, userId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Пользователь с айди " + userId + " не найден");
+    public User getUser(Integer id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        List<User> users = jdbcTemplate.query(sql, userMapper, id);
+        if (users.isEmpty()) {
+            throw new NotFoundException("Пользователь с айди " + id + " не найден");
         }
+        return users.get(0);
     }
 
     @Override
-    public void deleteUser(Integer userId) {
-        getUser(userId);
-        String sql = "DELETE FROM users WHERE id = ?";
-        jdbcTemplate.update(sql, userId);
-        log.info("Пользователь с айди " + userId + " удален");
-    }
+    public void deleteUser(Integer id) {
+        getUser(id);
+        String deleteFriendsQuery = "DELETE FROM friends WHERE id_user = ? OR friend_id = ?";
+        jdbcTemplate.update(deleteFriendsQuery, id, id);
+        String deleteUserQuery = "DELETE FROM users WHERE id = ?";
+        jdbcTemplate.update(deleteUserQuery, id);
 
+        log.info("Пользователь удален");
+    }
 
     public void addFriend(Integer userId, Integer friendId) {
         getUser(userId);

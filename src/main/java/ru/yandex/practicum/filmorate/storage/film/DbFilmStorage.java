@@ -187,12 +187,21 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Film film) {
-        String sql = "DELETE FROM films WHERE ID = ? ";
-        if (jdbcTemplate.update(sql, film.getId()) == 0) {
-            throw new NotFoundException("Фильм не найден!");
-        }
+    public void deleteFilm(Integer id) {
+        getFilm(id);
+        String deleteLikesQuery = "DELETE FROM likes WHERE id_films = ?";
+        jdbcTemplate.update(deleteLikesQuery, id);
+
+        String deleteFilmGenreQuery = "DELETE FROM film_genre WHERE id_films = ?";
+        jdbcTemplate.update(deleteFilmGenreQuery, id);
+
+        String deleteFilmDirectorQuery = "DELETE FROM film_director WHERE id_film = ?";
+        jdbcTemplate.update(deleteFilmDirectorQuery, id);
+
+        String deleteFilmQuery = "DELETE FROM films WHERE id = ?";
+        jdbcTemplate.update(deleteFilmQuery, id);
     }
+
 
 
     public void validateFilm(Film film) {

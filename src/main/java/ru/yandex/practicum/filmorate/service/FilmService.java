@@ -44,9 +44,9 @@ public class FilmService {
         dbFilmStorage.deleteLike(id, userId);
     }
 
-    public void removeFilm(Film film) {
-        log.info("Удаление фильма с айди " + film.getId());
-        dbFilmStorage.deleteFilm(film);
+    public void removeFilm(Integer id) {
+        log.info("Удаление фильма с айди " + id);
+        dbFilmStorage.deleteFilm(id);
     }
 
     public List<Integer> getLikes(Integer count) {

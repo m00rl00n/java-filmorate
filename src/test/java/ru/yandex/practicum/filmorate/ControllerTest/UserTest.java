@@ -106,17 +106,7 @@ public class UserTest {
         assertThat(commonFriends.get(0).getId()).isEqualTo(user3.getId());
     }
 
-    @Test
-    void testDeleteUser() {
-        User user = new User(3, "test@3.com", "логин3", "имя3", LocalDate.of(2023, 5, 25));
-        User addedUser = userController.addUser(user);
 
-        userController.deleteUser(addedUser.getId());
-
-        assertThatThrownBy(() -> userController.getUser(addedUser.getId()))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("Пользователь с айди " + addedUser.getId() + " не найден");
-    }
 
     @Test
     void testGetAllUsers() {

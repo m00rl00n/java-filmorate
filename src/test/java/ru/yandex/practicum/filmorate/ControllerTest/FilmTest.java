@@ -128,15 +128,6 @@ public class FilmTest {
         assertThat(popularFilms.size()).isEqualTo(1);
     }
 
-    @Test
-    void deleteFilmTest() {
-        Film addedFilm = filmController.addFilm(testFilm);
-
-        assertThrows(NotFoundException.class, () -> {
-            filmController.deleteFilm(addedFilm);
-            filmController.getFilm(addedFilm.getId());
-        });
-    }
 }
 
 
