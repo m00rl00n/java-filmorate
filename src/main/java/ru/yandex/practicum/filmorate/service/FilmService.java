@@ -10,13 +10,12 @@ import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
 import java.util.List;
 
 
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
     @Autowired
-    private  final DbFilmStorage dbFilmStorage;
+    private final DbFilmStorage dbFilmStorage;
 
 
     public Film addFilm(Film film) {
@@ -47,7 +46,7 @@ public class FilmService {
 
     public void removeFilm(Film film) {
         log.info("Удаление фильма с айди " + film.getId());
-       dbFilmStorage.deleteFilm(film);
+        dbFilmStorage.deleteFilm(film);
     }
 
     public List<Integer> getLikes(Integer count) {
@@ -58,6 +57,9 @@ public class FilmService {
         return dbFilmStorage.sortByLikes(max);
     }
 
+    public List<Film> getByDirectorId(Integer directorId, String sortBy) {
+        return dbFilmStorage.findByDirectorId(directorId, sortBy);
+    }
 
 }
 

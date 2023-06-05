@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.user.DbUserStorage;
@@ -29,7 +30,7 @@ public class DbFilmStorage implements FilmStorage {
     @Autowired
     private final JdbcTemplate jdbcTemplate;
     @Autowired
-    private final  FilmMapper filmMapper;
+    private final FilmMapper filmMapper;
     @Autowired
     private final DbUserStorage dbUserStorage;
 
@@ -54,6 +55,9 @@ public class DbFilmStorage implements FilmStorage {
         if (film.getGenres() != null) {
             setGenres(film);
         }
+        if (film.getDirectors() != null) {
+            setDirectors(film);
+        }
         log.info("Фильм добавлен");
         return film;
     }
@@ -73,6 +77,7 @@ public class DbFilmStorage implements FilmStorage {
         if (film.getGenres() != null) {
             setGenres(film);
         }
+        setDirectors(film);
         return getFilm(film.getId());
     }
 
@@ -127,6 +132,26 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sql, filmMapper, count);
     }
 
+    @Override
+    public List<Film> findByDirectorId(Integer id, String sortBy) {
+        String sql;
+        if (sortBy.equals("year")) {
+            sql = "select f.*, EXTRACT(YEAR FROM CAST(f.release_date AS date)) as release_year " +
+                    "from films f " +
+                    "left join film_director fd on f.id = fd.id_film " +
+                    "where fd.id_director = ? " +
+                    "order by release_year asc";
+        } else {
+            sql = "select f.* from films f " +
+                    "left join film_director fd on f.id = fd.id_film " +
+                    "left join likes l on f.id = l.id_films " +
+                    "where fd.id_director = ? " +
+                    "group by f.id " +
+                    "order by count(l.id_user) desc";
+        }
+        return jdbcTemplate.query(sql, filmMapper, id);
+    }
+
     public void setGenres(Film film) {
         Set<Genre> genreSet = new HashSet<>(film.getGenres());
 
@@ -147,6 +172,18 @@ public class DbFilmStorage implements FilmStorage {
         }
 
         film.setGenres(genreSet);
+    }
+
+    public void setDirectors(Film film) {
+        Set<Director> directorSet = film.getDirectors();
+        jdbcTemplate.update("delete from film_director where id_film = ?", film.getId());
+        if (directorSet != null) {
+            for (Director director : directorSet) {
+                jdbcTemplate.update("insert into film_director (id_film, id_director) values (?, ?)",
+                        film.getId(),
+                        director.getId());
+            }
+        }
     }
 
     @Override
