@@ -203,7 +203,6 @@ public class DbFilmStorage implements FilmStorage {
     }
 
 
-
     public void validateFilm(Film film) {
         final int MAX_DESCRIPTION_LENGTH = 200;
 

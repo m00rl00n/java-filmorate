@@ -33,7 +33,7 @@ public class UserService {
     }
 
     public void deleteUserById(Integer id) {
-         dbUserStorage.deleteUser(id);
+        dbUserStorage.deleteUser(id);
 
 
     }
