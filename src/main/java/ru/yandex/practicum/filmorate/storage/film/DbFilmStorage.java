@@ -233,15 +233,15 @@ public class DbFilmStorage implements FilmStorage {
 
 
 
-    public List<Film> getRecommendations(Integer firstUserId, Integer similarUserId) {
+    public List<Film> getRecommendations(Integer userId, Integer similarUserId) {
         List<Film> recommendations = new ArrayList<>();
         if (similarUserId != null) {
-            SqlRowSet findId = jdbcTemplate.queryForRowSet("SELECT id_film FROM Likes_Film WHERE id_user = ? " +
-                            "AND id_film NOT IN (SELECT id_film FROM Likes_Film WHERE id_user = ?)",
-                    similarUserId, firstUserId);
+            SqlRowSet findId = jdbcTemplate.queryForRowSet("SELECT id_films FROM likes WHERE id_user = ? " +
+                            "AND id_films NOT IN (SELECT id_films FROM likes WHERE id_user = ?)",
+                    similarUserId, userId);
 
             while (findId.next()) {
-                recommendations.add(getFilm(findId.getInt("id_film")));
+                recommendations.add(getFilm(findId.getInt("id_films")));
             }
         }
         return recommendations;
