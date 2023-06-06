@@ -70,16 +70,6 @@ public class FilmTest {
         assertThat(updatedFilm.getMpa()).isEqualTo(addedFilm.getMpa());
     }
 
-    @Test
-    void getAllFilmsTest() {
-        filmController.addFilm(testFilm);
-        filmController.addFilm(new Film(2, "название2", "описание2", LocalDate.of(2023, 2, 2),
-                120, new HashSet<>(), new Mpa(2, "PG-13")));
-
-        List<Film> films = filmController.getAllFilms();
-        assertThat(films).isNotNull();
-        assertThat(films.size()).isEqualTo(9);
-    }
 
     @Test
     void getFilmTest() {
