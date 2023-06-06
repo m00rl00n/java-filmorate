@@ -59,7 +59,7 @@ public class UserService {
         return dbUserStorage.checkCommonFriends(id, otherId);
     }
 
-    public List<Film> getRecommendations(Integer userId){
+    public List<Film> getRecommendations(Integer userId) {
         return dbFilmStorage.getRecommendations(userId,
                 dbUserStorage.getIdUserWithMostOverlappingLikes(userId));
     }

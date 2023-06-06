@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -230,7 +229,6 @@ public class DbFilmStorage implements FilmStorage {
 
         return jdbcTemplate.query(sql, filmMapper, idUser, idFriend);
     }
-
 
 
     public List<Film> getRecommendations(Integer userId, Integer similarUserId) {
