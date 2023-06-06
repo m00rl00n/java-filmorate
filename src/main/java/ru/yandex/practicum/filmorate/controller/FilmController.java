@@ -38,9 +38,9 @@ public class FilmController {
         return filmService.getAllFilm();
     }
 
-    @DeleteMapping
-    public void deleteFilm(@RequestBody Film film) {
-        filmService.removeFilm(film);
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable("filmId") Integer id) {
+        filmService.removeFilm(id);
     }
 
     @GetMapping("/{id}")
@@ -91,6 +91,10 @@ public class FilmController {
         return list;
     }
 
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam("userId") Integer userId, @RequestParam("friendId") Integer friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
 }
 
 

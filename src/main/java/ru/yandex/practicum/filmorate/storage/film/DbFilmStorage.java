@@ -204,11 +204,30 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Film film) {
-        String sql = "DELETE FROM films WHERE ID = ? ";
-        if (jdbcTemplate.update(sql, film.getId()) == 0) {
-            throw new NotFoundException("Фильм не найден!");
-        }
+    public void deleteFilm(Integer id) {
+        getFilm(id);
+        String deleteLikesQuery = "DELETE FROM likes WHERE id_films = ?";
+        jdbcTemplate.update(deleteLikesQuery, id);
+
+        String deleteFilmGenreQuery = "DELETE FROM film_genre WHERE id_films = ?";
+        jdbcTemplate.update(deleteFilmGenreQuery, id);
+
+        String deleteFilmDirectorQuery = "DELETE FROM film_director WHERE id_film = ?";
+        jdbcTemplate.update(deleteFilmDirectorQuery, id);
+
+        String deleteFilmQuery = "DELETE FROM films WHERE id = ?";
+        jdbcTemplate.update(deleteFilmQuery, id);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Integer idUser, Integer idFriend) {
+        String sql = "SELECT f.* FROM films f " +
+                "INNER JOIN likes ul ON f.id = ul.id_films AND ul.id_user = ? " +
+                "INNER JOIN likes fl ON f.id = fl.id_films AND fl.id_user = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(*) DESC";
+
+        return jdbcTemplate.query(sql, filmMapper, idUser, idFriend);
     }
 
 

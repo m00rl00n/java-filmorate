@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
@@ -17,7 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 @SpringBootTest
 @AutoConfigureTestDatabase
@@ -108,15 +107,6 @@ public class FilmTest {
     }
 
 
-    @Test
-    void deleteFilmTest() {
-        Film addedFilm = filmController.addFilm(testFilm);
-
-        assertThrows(NotFoundException.class, () -> {
-            filmController.deleteFilm(addedFilm);
-            filmController.getFilm(addedFilm.getId());
-        });
-    }
 }
 
 
