@@ -8,14 +8,18 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
 
 import java.sql.PreparedStatement;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,7 +32,6 @@ public class DbUserStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     @Autowired
     private final UserMapper userMapper;
-
 
     @Override
     public User addUser(User user) {
@@ -133,6 +136,18 @@ public class DbUserStorage implements UserStorage {
                 "WHERE f.id_user = ? " +
                 "AND f.friend_id IN (SELECT friend_id FROM friends WHERE id_user = ?)";
         return jdbcTemplate.query(sql, userMapper, userId, otherId);
+    }
+
+    public Integer getIdUserWithMostOverlappingLikes(int userId) {
+        Integer similarUserId = null;
+        SqlRowSet findIdUser = jdbcTemplate.queryForRowSet(
+                "SELECT id_user, COUNT(id_user) as films_intersect_n FROM likes " +
+                        "WHERE id_films IN (SELECT id_films FROM likes WHERE id_user = ?) AND id_user != ? " +
+                        "GROUP BY id_user ORDER BY films_intersect_n desc LIMIT 1", userId, userId);
+        if (findIdUser.next()) {
+            similarUserId = findIdUser.getInt("id_user");
+        }
+        return similarUserId;
     }
 
     public void validateUser(User user) {

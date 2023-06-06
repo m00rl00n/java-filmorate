@@ -5,9 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -29,10 +31,9 @@ public class DbFilmStorage implements FilmStorage {
     @Autowired
     private final JdbcTemplate jdbcTemplate;
     @Autowired
-    private final  FilmMapper filmMapper;
+    private final FilmMapper filmMapper;
     @Autowired
     private final DbUserStorage dbUserStorage;
-
 
     @Override
     public Film addFilm(Film film) {
@@ -155,6 +156,21 @@ public class DbFilmStorage implements FilmStorage {
         if (jdbcTemplate.update(sql, film.getId()) == 0) {
             throw new NotFoundException("Фильм не найден!");
         }
+    }
+
+
+    public List<Film> getRecommendations(Integer firstUserId, Integer similarUserId) {
+        List<Film> recommendations = new ArrayList<>();
+        if (similarUserId != null) {
+            SqlRowSet findId = jdbcTemplate.queryForRowSet("SELECT id_film FROM Likes_Film WHERE id_user = ? " +
+                            "AND id_film NOT IN (SELECT id_film FROM Likes_Film WHERE id_user = ?)",
+                    similarUserId, firstUserId);
+
+            while (findId.next()) {
+                recommendations.add(getFilm(findId.getInt("id_film")));
+            }
+        }
+        return recommendations;
     }
 
 
