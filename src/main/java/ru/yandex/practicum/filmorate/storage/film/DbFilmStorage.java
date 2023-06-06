@@ -202,6 +202,17 @@ public class DbFilmStorage implements FilmStorage {
         jdbcTemplate.update(deleteFilmQuery, id);
     }
 
+    @Override
+    public List<Film> getCommonFilms(Integer idUser, Integer idFriend) {
+        String sql = "SELECT f.* FROM films f " +
+                "INNER JOIN likes ul ON f.id = ul.id_films AND ul.id_user = ? " +
+                "INNER JOIN likes fl ON f.id = fl.id_films AND fl.id_user = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(*) DESC";
+
+        return jdbcTemplate.query(sql, filmMapper, idUser, idFriend);
+    }
+
 
     public void validateFilm(Film film) {
         final int MAX_DESCRIPTION_LENGTH = 200;
