@@ -122,14 +122,31 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("id_user"), filmId);
     }
 
-    public List<Film> sortByLikes(int count) {
+    public List<Film> sortByLikes(int count, Integer genreId, Integer year) {
         String sql = "SELECT f.* FROM films f " +
                 "LEFT JOIN likes l ON f.id = l.id_films " +
-                "GROUP BY f.id " +
+                "LEFT JOIN film_genre fg ON f.id = fg.id_films " +
+                "WHERE 1 = 1 ";
+
+        List<Object> parameters = new ArrayList<>();
+
+        if (genreId != null) {
+            sql += "AND fg.id_genre = ? ";
+            parameters.add(genreId);
+        }
+
+        if (year != null) {
+            sql += "AND YEAR(f.release_date) = ? ";
+            parameters.add(year);
+        }
+
+        sql += "GROUP BY f.id " +
                 "ORDER BY COUNT(l.id_user) DESC " +
                 "LIMIT ?";
 
-        return jdbcTemplate.query(sql, filmMapper, count);
+        parameters.add(count);
+
+        return jdbcTemplate.query(sql, filmMapper, parameters.toArray());
     }
 
     @Override
@@ -212,6 +229,7 @@ public class DbFilmStorage implements FilmStorage {
 
         return jdbcTemplate.query(sql, filmMapper, idUser, idFriend);
     }
+
 
 
     public void validateFilm(Film film) {

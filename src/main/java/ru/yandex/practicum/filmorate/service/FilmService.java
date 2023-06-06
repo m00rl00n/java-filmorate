@@ -53,17 +53,21 @@ public class FilmService {
         return dbFilmStorage.getLikes(count);
     }
 
-    public List<Film> getMostPopular(int max) {
-        return dbFilmStorage.sortByLikes(max);
-    }
 
     public List<Film> getByDirectorId(Integer directorId, String sortBy) {
         return dbFilmStorage.findByDirectorId(directorId, sortBy);
     }
 
+
+    public List<Film> getTopLikedFilms(Integer count, Integer genreId, Integer year) {
+        return dbFilmStorage.sortByLikes(count, genreId, year);
+    }
+
+
     public List<Film> getCommonFilms(Integer userId, Integer friendId) {
         return dbFilmStorage.getCommonFilms(userId, friendId);
     }
+
 }
 
 

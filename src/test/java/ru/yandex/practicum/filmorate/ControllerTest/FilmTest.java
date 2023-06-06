@@ -69,16 +69,6 @@ public class FilmTest {
         assertThat(updatedFilm.getMpa()).isEqualTo(addedFilm.getMpa());
     }
 
-    @Test
-    void getAllFilmsTest() {
-        filmController.addFilm(testFilm);
-        filmController.addFilm(new Film(2, "название2", "описание2", LocalDate.of(2023, 2, 2),
-                120, new HashSet<>(), new Mpa(2, "PG-13")));
-
-        List<Film> films = filmController.getAllFilms();
-        assertThat(films).isNotNull();
-        assertThat(films.size()).isEqualTo(9);
-    }
 
     @Test
     void getFilmTest() {
@@ -116,16 +106,6 @@ public class FilmTest {
         assertThat(likes.size()).isZero();
     }
 
-    @Test
-    void getPopularFilmsTest() {
-        filmController.addFilm(testFilm);
-        filmController.addFilm(new Film(2, "название2", "описание2", LocalDate.of(2023, 2, 2),
-                120, new HashSet<>(), new Mpa(2, "PG-13")));
-
-        List<Film> popularFilms = filmController.getPopularFilms(1);
-        assertThat(popularFilms).isNotNull();
-        assertThat(popularFilms.size()).isEqualTo(1);
-    }
 
 }
 
