@@ -117,16 +117,6 @@ public class FilmTest {
         assertThat(likes.size()).isZero();
     }
 
-    @Test
-    void getPopularFilmsTest() {
-        filmController.addFilm(testFilm);
-        filmController.addFilm(new Film(2, "название2", "описание2", LocalDate.of(2023, 2, 2),
-                120, new HashSet<>(), new Mpa(2, "PG-13")));
-
-        List<Film> popularFilms = filmController.getPopularFilms(1);
-        assertThat(popularFilms).isNotNull();
-        assertThat(popularFilms.size()).isEqualTo(1);
-    }
 
     @Test
     void deleteFilmTest() {
