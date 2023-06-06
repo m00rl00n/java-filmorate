@@ -13,7 +13,7 @@ public interface FilmStorage {
 
     List<Film> getAllFilm();
 
-    void deleteFilm(Film film);
+    void deleteFilm(Integer id);
 
     List<Film> sortByLikes(int max);
 

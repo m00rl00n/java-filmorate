@@ -13,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    @Autowired
     UserService userService;
 
     @Autowired
@@ -45,9 +46,9 @@ public class UserController {
         userService.addFriend(userId, friendId);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("userId") Integer userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping("/{userId}")
+    public void deleteUserById(@PathVariable("userId") Integer userId) {
+        userService.deleteUserById(userId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
