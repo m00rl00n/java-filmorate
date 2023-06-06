@@ -36,8 +36,10 @@ public class UserService {
         return dbUserStorage.getUser(userId);
     }
 
-    public void deleteUser(Integer userId) {
-        dbUserStorage.deleteUser(userId);
+    public void deleteUserById(Integer id) {
+        dbUserStorage.deleteUser(id);
+
+
     }
 
     public void addFriend(Integer userId, Integer friendId) {
