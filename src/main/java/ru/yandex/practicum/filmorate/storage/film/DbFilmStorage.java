@@ -19,6 +19,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.user.DbUserStorage;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -233,14 +235,11 @@ public class DbFilmStorage implements FilmStorage {
 
     public List<Film> getRecommendations(Integer userId, Integer similarUserId) {
         List<Film> recommendations = new ArrayList<>();
+        String sql = "SELECT * FROM films WHERE id IN" +
+                "(SELECT id_films FROM likes WHERE id_user = ? " +
+                "AND id_films NOT IN (SELECT id_films FROM likes WHERE id_user = ?))";
         if (similarUserId != null) {
-            SqlRowSet findId = jdbcTemplate.queryForRowSet("SELECT id_films FROM likes WHERE id_user = ? " +
-                            "AND id_films NOT IN (SELECT id_films FROM likes WHERE id_user = ?)",
-                    similarUserId, userId);
-
-            while (findId.next()) {
-                recommendations.add(getFilm(findId.getInt("id_films")));
-            }
+            recommendations = jdbcTemplate.query(sql, filmMapper, similarUserId, userId);
         }
         return recommendations;
     }
