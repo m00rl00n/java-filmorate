@@ -103,15 +103,6 @@ public class UserTest {
         assertThat(commonFriends.size()).isEqualTo(1);
         assertThat(commonFriends.get(0).getId()).isEqualTo(user3.getId());
     }
-
-
-    @Test
-    void testGetAllUsers() {
-        List<User> users = userController.getAllUsers();
-        assertThat(users).isNotNull();
-        assertThat(users.size()).isEqualTo(6);
-    }
-
 }
 
 

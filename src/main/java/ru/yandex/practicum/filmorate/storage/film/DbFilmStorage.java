@@ -34,7 +34,6 @@ public class DbFilmStorage implements FilmStorage {
     @Autowired
     private final DbUserStorage dbUserStorage;
 
-
     @Override
     public Film addFilm(Film film) {
         validateFilm(film);
@@ -230,6 +229,17 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sql, filmMapper, idUser, idFriend);
     }
 
+
+    public List<Film> getRecommendations(Integer userId, Integer similarUserId) {
+        List<Film> recommendations = new ArrayList<>();
+        String sql = "SELECT * FROM films WHERE id IN" +
+                "(SELECT id_films FROM likes WHERE id_user = ? " +
+                "AND id_films NOT IN (SELECT id_films FROM likes WHERE id_user = ?))";
+        if (similarUserId != null) {
+            recommendations = jdbcTemplate.query(sql, filmMapper, similarUserId, userId);
+        }
+        return recommendations;
+    }
 
 
     public void validateFilm(Film film) {
