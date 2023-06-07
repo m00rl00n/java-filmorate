@@ -85,6 +85,12 @@ public class FilmController {
         }
         return list;
     }
+
+    @GetMapping("/search")
+    public List<Film> getBySearchParameters(@RequestParam String query,
+                                            @RequestParam List<String> by) {
+        return filmService.searchWithParams(query,by);
+    }
 }
 
 

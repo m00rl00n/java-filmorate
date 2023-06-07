@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -59,6 +60,14 @@ public class FilmService {
 
     public List<Film> getByDirectorId(Integer directorId, String sortBy) {
         return dbFilmStorage.findByDirectorId(directorId, sortBy);
+    }
+
+    public List<Film> searchWithParams(String text,List<String> params) {
+        boolean hasDirector = params.stream().anyMatch(v -> v.equals("director"));
+        boolean hasTitle = params.stream().anyMatch(v -> v.equals("title"));
+        if (hasDirector && !hasTitle) return new ArrayList<>(dbFilmStorage.getFilmByDirectorParam(text));
+        if (hasTitle && !hasDirector) return new ArrayList<>(dbFilmStorage.getFilmsByTitleParam(text));
+        return new ArrayList<>(dbFilmStorage.getFilmByBothParams(text));
     }
 
 }
