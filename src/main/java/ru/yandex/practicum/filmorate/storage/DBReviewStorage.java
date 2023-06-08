@@ -71,9 +71,7 @@ public class DBReviewStorage implements ReviewStorage {
     public void delete(int id) {
         log.info("Удаление отзыва");
         String sqlQuery = "DELETE FROM reviews WHERE id = ?";
-        if (jdbcTemplate.update(sqlQuery,
-                id) > 0) {
-        } else {
+        if (jdbcTemplate.update(sqlQuery, id) == 0) {
             throw new NotFoundException("Отзыв для удаления отсутствует");
         }
     }
@@ -131,8 +129,7 @@ public class DBReviewStorage implements ReviewStorage {
         if (jdbcTemplate.update(sqlQuery,
                 idReview,
                 idUser,
-                rate) == 0)
-        {
+                rate) == 0) {
            throw new NotFoundException("Отзыв для обновления отсутствует");
         }
     }
@@ -143,8 +140,7 @@ public class DBReviewStorage implements ReviewStorage {
         String sqlQuery = "DELETE  FROM REVIEWS_EVALUATION WHERE ID_REVIEW = ? AND ID_USER = ?";
         if (jdbcTemplate.update(sqlQuery,
                 idReview,
-                idUser) == 0)
-        {
+                idUser) == 0) {
             throw new NotFoundException("Отзыв для обновления отсутствует");
         }
     }
