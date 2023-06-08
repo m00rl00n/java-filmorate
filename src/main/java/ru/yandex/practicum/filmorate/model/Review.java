@@ -20,7 +20,7 @@ public class Review {
     @Size(max = 200, message = "Превышена максимальная длина описания(100)")
     private String content;
 
-    @JsonProperty(value="isPositive")
+    @JsonProperty(value = "isPositive")
     @NotNull
     private Boolean isPositive;
 
@@ -44,7 +44,7 @@ public class Review {
         this.filmId = filmId;
     }
 
-    @JsonProperty(value="isPositive")
+    @JsonProperty(value = "isPositive")
     public boolean isPositive() {
         return isPositive;
     }
