@@ -33,8 +33,7 @@ public class ReviewService {
         return dbReviewStorage.getReviews();
     }
 
-    public List<Review> getByIdFilm(int idFilm, int count)
-    {
+    public List<Review> getByIdFilm(int idFilm, int count) {
         if (idFilm == 0 && count == 0) {
             return dbReviewStorage.getReviews();
         } else {

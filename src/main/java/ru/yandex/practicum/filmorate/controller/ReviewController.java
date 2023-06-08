@@ -42,8 +42,7 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews/{id}")
-    public ResponseEntity<Review> getReviewById(@PathVariable @Positive(message = "id отзыва не положительное число") int id)
-    {
+    public ResponseEntity<Review> getReviewById(@PathVariable @Positive(message = "id отзыва не положительное число") int id) {
         log.info("Получение отзыва");
         return new ResponseEntity<Review>(reviewService.getById(id), HttpStatus.OK);
     }
