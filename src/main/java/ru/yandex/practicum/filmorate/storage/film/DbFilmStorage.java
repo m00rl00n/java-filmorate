@@ -207,8 +207,8 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public List<Film> getFilmByDirectorParam(String director) {
         String sql = "SELECT * FROM films f " +
-                "left join film_director fd on fd.id_film = f.id\n" +
-                "left join directors d on d.id = fd.id_director\n" +
+                "left join film_director fd on fd.id_film = f.id " +
+                "left join directors d on d.id = fd.id_director " +
                 "LEFT JOIN likes l ON f.id = l.id_films " +
                 "WHERE d.name ILIKE '%' || ? || '%' " +
                 "GROUP BY f.id " +
@@ -218,11 +218,11 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmByBothParams(String param) {
-        String sql = "SELECT * FROM films f \n" +
-                "left join film_director fd on fd.id_film = f.id\n" +
-                "left join directors d on d.id = fd.id_director\n" +
+        String sql = "SELECT * FROM films f " +
+                "left join film_director fd on fd.id_film = f.id " +
+                "left join directors d on d.id = fd.id_director " +
                 "LEFT JOIN likes l ON f.id = l.id_films " +
-                "where f.name ILIKE '%' || ? || '%'\n" +
+                "where f.name ILIKE '%' || ? || '%' " +
                 "or d.name ILIKE '%' || ? || '%' " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(l.id_user) DESC";

@@ -63,11 +63,11 @@ public class FilmService {
     }
 
     public List<Film> searchWithParams(String text,List<String> params) {
-        boolean hasDirector = params.stream().anyMatch(v -> v.equals("director"));
-        boolean hasTitle = params.stream().anyMatch(v -> v.equals("title"));
-        if (hasDirector && !hasTitle) return new ArrayList<>(dbFilmStorage.getFilmByDirectorParam(text));
-        if (hasTitle && !hasDirector) return new ArrayList<>(dbFilmStorage.getFilmsByTitleParam(text));
-        return new ArrayList<>(dbFilmStorage.getFilmByBothParams(text));
+        boolean hasDirector = params.contains("director");
+        boolean hasTitle = params.contains("title");
+        if (hasDirector && !hasTitle) return dbFilmStorage.getFilmByDirectorParam(text);
+        if (hasTitle && !hasDirector) return dbFilmStorage.getFilmsByTitleParam(text);
+        return dbFilmStorage.getFilmByBothParams(text);
     }
 
 }
