@@ -248,7 +248,7 @@ public class DbFilmStorage implements FilmStorage {
                 "WHERE f.name ILIKE '%' || ? || '%' " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(l.id_user) DESC";
-        return jdbcTemplate.query(sql,filmMapper,title);
+        return jdbcTemplate.query(sql, filmMapper, title);
     }
 
     @Override
@@ -260,7 +260,7 @@ public class DbFilmStorage implements FilmStorage {
                 "WHERE d.name ILIKE '%' || ? || '%' " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(l.id_user) DESC";
-        return jdbcTemplate.query(sql,filmMapper,director);
+        return jdbcTemplate.query(sql, filmMapper, director);
     }
 
     @Override
@@ -273,7 +273,7 @@ public class DbFilmStorage implements FilmStorage {
                 "or d.name ILIKE '%' || ? || '%' " +
                 "GROUP BY f.id " +
                 "ORDER BY COUNT(l.id_user) DESC";
-        return jdbcTemplate.query(sql,filmMapper, param, param);
+        return jdbcTemplate.query(sql, filmMapper, param, param);
     }
 
 
