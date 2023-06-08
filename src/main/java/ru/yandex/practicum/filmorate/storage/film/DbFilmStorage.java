@@ -34,7 +34,6 @@ public class DbFilmStorage implements FilmStorage {
     @Autowired
     private final DbUserStorage dbUserStorage;
 
-
     @Override
     public Film addFilm(Film film) {
         validateFilm(film);
@@ -122,14 +121,31 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("id_user"), filmId);
     }
 
-    public List<Film> sortByLikes(int count) {
+    public List<Film> sortByLikes(int count, Integer genreId, Integer year) {
         String sql = "SELECT f.* FROM films f " +
                 "LEFT JOIN likes l ON f.id = l.id_films " +
-                "GROUP BY f.id " +
+                "LEFT JOIN film_genre fg ON f.id = fg.id_films " +
+                "WHERE 1 = 1 ";
+
+        List<Object> parameters = new ArrayList<>();
+
+        if (genreId != null) {
+            sql += "AND fg.id_genre = ? ";
+            parameters.add(genreId);
+        }
+
+        if (year != null) {
+            sql += "AND YEAR(f.release_date) = ? ";
+            parameters.add(year);
+        }
+
+        sql += "GROUP BY f.id " +
                 "ORDER BY COUNT(l.id_user) DESC " +
                 "LIMIT ?";
 
-        return jdbcTemplate.query(sql, filmMapper, count);
+        parameters.add(count);
+
+        return jdbcTemplate.query(sql, filmMapper, parameters.toArray());
     }
 
     @Override
@@ -187,11 +203,42 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void deleteFilm(Film film) {
-        String sql = "DELETE FROM films WHERE ID = ? ";
-        if (jdbcTemplate.update(sql, film.getId()) == 0) {
-            throw new NotFoundException("Фильм не найден!");
+    public void deleteFilm(Integer id) {
+        getFilm(id);
+        String deleteLikesQuery = "DELETE FROM likes WHERE id_films = ?";
+        jdbcTemplate.update(deleteLikesQuery, id);
+
+        String deleteFilmGenreQuery = "DELETE FROM film_genre WHERE id_films = ?";
+        jdbcTemplate.update(deleteFilmGenreQuery, id);
+
+        String deleteFilmDirectorQuery = "DELETE FROM film_director WHERE id_film = ?";
+        jdbcTemplate.update(deleteFilmDirectorQuery, id);
+
+        String deleteFilmQuery = "DELETE FROM films WHERE id = ?";
+        jdbcTemplate.update(deleteFilmQuery, id);
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Integer idUser, Integer idFriend) {
+        String sql = "SELECT f.* FROM films f " +
+                "INNER JOIN likes ul ON f.id = ul.id_films AND ul.id_user = ? " +
+                "INNER JOIN likes fl ON f.id = fl.id_films AND fl.id_user = ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(*) DESC";
+
+        return jdbcTemplate.query(sql, filmMapper, idUser, idFriend);
+    }
+
+
+    public List<Film> getRecommendations(Integer userId, Integer similarUserId) {
+        List<Film> recommendations = new ArrayList<>();
+        String sql = "SELECT * FROM films WHERE id IN" +
+                "(SELECT id_films FROM likes WHERE id_user = ? " +
+                "AND id_films NOT IN (SELECT id_films FROM likes WHERE id_user = ?))";
+        if (similarUserId != null) {
+            recommendations = jdbcTemplate.query(sql, filmMapper, similarUserId, userId);
         }
+        return recommendations;
     }
 
     @Override

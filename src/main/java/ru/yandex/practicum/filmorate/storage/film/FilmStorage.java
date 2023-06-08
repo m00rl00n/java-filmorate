@@ -13,9 +13,7 @@ public interface FilmStorage {
 
     List<Film> getAllFilm();
 
-    void deleteFilm(Film film);
-
-    List<Film> sortByLikes(int max);
+    void deleteFilm(Integer id);
 
     List<Film> findByDirectorId(Integer id, String sortBy);
 
@@ -25,4 +23,7 @@ public interface FilmStorage {
 
     List<Film> getFilmByBothParams(String param);
 
+    List<Film> sortByLikes(int count, Integer genreId, Integer year);
+
+    List<Film> getCommonFilms(Integer idUser, Integer idFriend);
 }

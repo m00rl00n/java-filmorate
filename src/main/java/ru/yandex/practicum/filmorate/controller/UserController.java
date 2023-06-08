@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
+    @Autowired
     UserService userService;
 
     @Autowired
@@ -45,9 +47,9 @@ public class UserController {
         userService.addFriend(userId, friendId);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable("userId") Integer userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping("/{userId}")
+    public void deleteUserById(@PathVariable("userId") Integer userId) {
+        userService.deleteUserById(userId);
     }
 
     @DeleteMapping("/{userId}/friends/{friendId}")
@@ -64,5 +66,10 @@ public class UserController {
     public List<User> getCommonFriends(@PathVariable("userId") Integer userId,
                                        @PathVariable("otherId") Integer otherId) {
         return userService.getCommonFriends(userId, otherId);
+    }
+
+    @GetMapping("/{id}/recommendations")
+    public List<Film> getRecommendations(@PathVariable("id") Integer userId) {
+        return userService.getRecommendations(userId);
     }
 }
