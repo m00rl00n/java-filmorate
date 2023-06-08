@@ -59,6 +59,14 @@ public class FilmService {
     }
 
 
+    public List<Film> searchWithParams(String text, List<String> params) {
+        boolean hasDirector = params.contains("director");
+        boolean hasTitle = params.contains("title");
+        if (hasDirector && !hasTitle) return dbFilmStorage.getFilmByDirectorParam(text);
+        if (hasTitle && !hasDirector) return dbFilmStorage.getFilmsByTitleParam(text);
+        return dbFilmStorage.getFilmByBothParams(text);
+    }
+
     public List<Film> getTopLikedFilms(Integer count, Integer genreId, Integer year) {
         return dbFilmStorage.sortByLikes(count, genreId, year);
     }
