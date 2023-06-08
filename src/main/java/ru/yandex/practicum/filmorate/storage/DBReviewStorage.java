@@ -9,17 +9,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.model.Review;
 
-import java.sql.PreparedStatement;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+
 
 @Component
 @Primary
@@ -39,6 +37,8 @@ public class DBReviewStorage implements ReviewStorage {
     @Override
     public Review add(Review review) {
         log.info("Создание отзыва");
+        userIdIsExist(review.getUserId());
+        filmIdIsExist(review.getFilmId());
         try {
             SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                     .withTableName("reviews")
@@ -50,27 +50,6 @@ public class DBReviewStorage implements ReviewStorage {
         }
         return review;
     }
-
-   /* @Override
-    public Review add(Review review) {
-        log.info("Создание отзыва");
-        try {
-            String sql = "insert into reviews (content,is_positive,id_user,id_film) values (?,?,?,?)";
-            KeyHolder keyHolder = new GeneratedKeyHolder();
-            jdbcTemplate.update(con -> {
-                PreparedStatement statement = con.prepareStatement(sql, new String[]{"id"});
-                statement.setString(1, review.getContent());
-                statement.setBoolean(2, review.getIsPositive());
-                statement.setInt(3, review.getUserId());
-                statement.setInt(4, review.getFilmId());
-                return statement;
-            }, keyHolder);
-            review.setReviewId(Objects.requireNonNull(keyHolder.getKey()).intValue());
-            return review;
-        } catch (DataIntegrityViolationException e) {
-            throw new NotFoundException("Не найден пользователь или фильм");
-        }
-    }*/
 
     @Override
     public Review edit(Review review) {
@@ -101,31 +80,35 @@ public class DBReviewStorage implements ReviewStorage {
 
     @Override
     public Review getById(int id) {
-        log.info("Получение отзыва");
-        String sqlQuery = "SELECT r.*, EVALUATION_SUM FROM REVIEWS r \n" +
-                "LEFT JOIN (\n" +
-                "\tSELECT ID_REVIEW, SUM(re.EVALUATION) AS EVALUATION_SUM FROM reviews_evaluation re \n" +
-                "\tGROUP BY ID_REVIEW\n" +
-                "\t) re ON r.ID = re.ID_REVIEW\n" +
-                "WHERE r.ID = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, reviewMapper, id);
+        try {
+            log.info("Получение отзыва");
+            String sqlQuery = "SELECT r.*, EVALUATION_SUM FROM REVIEWS r \n" +
+                    "LEFT JOIN (\n" +
+                    "\tSELECT ID_REVIEW, SUM(re.EVALUATION) AS EVALUATION_SUM FROM reviews_evaluation re \n" +
+                    "\tGROUP BY ID_REVIEW\n" +
+                    "\t) re ON r.ID = re.ID_REVIEW\n" +
+                    "WHERE r.ID = ?";
+            return jdbcTemplate.queryForObject(sqlQuery, reviewMapper, id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Отзыв с айди " + id + " не найден");
+        }
     }
 
     @Override
     public List<Review> getReviews() {
         log.info("Получение всех отзывов");
-        String sqlQuery = "SELECT r.*, EVALUATION_SUM FROM REVIEWS r \n" +
+        String sqlQuery = "SELECT r.*, COALESCE(re.EVALUATION_SUM,0) AS EVALUATION_SUM FROM REVIEWS r \n" +
                 "LEFT JOIN (\n" +
                 "\tSELECT ID_REVIEW, SUM(re.EVALUATION) AS EVALUATION_SUM FROM reviews_evaluation re \n" +
                 "\tGROUP BY ID_REVIEW\n" +
-                "\t) re ON r.ID = re.ID_REVIEW\n";
+                "\t) re ON r.ID = re.ID_REVIEW\n ORDER BY EVALUATION_SUM DESC";
         return jdbcTemplate.query(sqlQuery, reviewMapper);
     }
 
     @Override
     public List<Review> getByIdFilm(int idFilm, int count) {
         log.info("Получение отзывов");
-        String sqlQuery = "SELECT r.*, EVALUATION_SUM FROM REVIEWS r \n" +
+        String sqlQuery = "SELECT r.*, COALESCE(re.EVALUATION_SUM,0) AS EVALUATION_SUM FROM REVIEWS r \n" +
                 "LEFT JOIN (\n" +
                 "\tSELECT ID_REVIEW, SUM(re.EVALUATION) AS EVALUATION_SUM FROM reviews_evaluation re \n" +
                 "\tGROUP BY ID_REVIEW\n" +
@@ -135,9 +118,10 @@ public class DBReviewStorage implements ReviewStorage {
             sqlQuery += "WHERE r.ID_FILM = ? ";
             parameters.add(idFilm);
         }
+        sqlQuery += "ORDER BY EVALUATION_SUM DESC ";
         sqlQuery += "LIMIT ?";
         parameters.add(count);
-        return jdbcTemplate.query(sqlQuery, reviewMapper, parameters);
+        return jdbcTemplate.query(sqlQuery, reviewMapper, parameters.toArray());
     }
 
     @Override
@@ -165,7 +149,22 @@ public class DBReviewStorage implements ReviewStorage {
         }
     }
 
-    private void updateRateRewiew(int idReview) {
-        log.info("Обновление рейтинга");
+    private void userIdIsExist(int id) {
+        boolean b = Boolean.TRUE.equals(jdbcTemplate.queryForObject(
+                "SELECT EXISTS(SELECT id FROM users WHERE id = ?)", Boolean.class, id));
+        if (!b) {
+            log.error("Передан некорректный id пользователя" + id);
+            throw new NotFoundException("Некорректный id " + id);
+        }
     }
+
+    private void filmIdIsExist(int id) {
+        boolean b = Boolean.TRUE.equals(jdbcTemplate.queryForObject(
+                "SELECT EXISTS(SELECT id FROM films WHERE id = ?)", Boolean.class, id));
+        if (!b) {
+            log.error("Передан некорректный id фильма" + id);
+            throw new NotFoundException("Некорректный id " + id);
+        }
+    }
+
 }

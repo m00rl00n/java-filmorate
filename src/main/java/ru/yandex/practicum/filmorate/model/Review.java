@@ -3,10 +3,8 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashMap;
@@ -21,7 +19,6 @@ public class Review {
     @NotBlank(message = "Описание не должно быть пустым")
     @Size(max = 200, message = "Превышена максимальная длина описания(100)")
     private String content;
-
 
     @JsonProperty(value="isPositive")
     @NotNull

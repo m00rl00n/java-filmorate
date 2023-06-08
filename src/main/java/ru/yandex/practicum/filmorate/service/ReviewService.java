@@ -35,7 +35,14 @@ public class ReviewService {
 
     public List<Review> getByIdFilm(int idFilm, int count)
     {
-       return dbReviewStorage.getByIdFilm(idFilm,count);
+        if (idFilm == 0 && count == 0) {
+            return dbReviewStorage.getReviews();
+        } else {
+            if (count == 0) {
+                count = 10;
+            }
+            return dbReviewStorage.getByIdFilm(idFilm, count);
+        }
     }
 
     public void setLike(int idReview, int idUser, boolean isLike) {

@@ -35,12 +35,6 @@ public class ReviewController {
         return new ResponseEntity<Review>(reviewService.edit(review), HttpStatus.OK);
     }
 
-    @GetMapping("/reviews")
-    public ResponseEntity<List<Review>> getReviews() {
-        log.info("Получение отзывов");
-        return new ResponseEntity<List<Review>>(reviewService.getReviews(), HttpStatus.OK);
-    }
-
     @DeleteMapping("/reviews/{id}")
     public void deleteReview(@PathVariable @Positive(message = "id отзыва не положительное число") int id) {
         log.info("Удаление отзыва");
@@ -54,10 +48,10 @@ public class ReviewController {
         return new ResponseEntity<Review>(reviewService.getById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/reviews?filmId={filmId}&count={count}")
-    public ResponseEntity<List<Review>> getReviewsByFilmID(@RequestParam(required = false,defaultValue = "0") int filmId, @RequestParam(required = false,defaultValue = "10") int count) {
+    @GetMapping("/reviews")
+    public ResponseEntity<List<Review>> getReviewsByFilmID(@RequestParam(required = false,defaultValue = "0") int filmId, @RequestParam(required = false,defaultValue = "0") int count) {
         log.info("Получение отзывов");
-        return new ResponseEntity<List<Review>>(reviewService.getByIdFilm(filmId,count), HttpStatus.OK);
+        return new ResponseEntity<List<Review>>(reviewService.getByIdFilm(filmId, count), HttpStatus.OK);
     }
 
     @PutMapping("/reviews/{id}/like/{userId}")
