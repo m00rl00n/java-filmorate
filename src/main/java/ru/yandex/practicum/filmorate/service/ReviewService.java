@@ -49,7 +49,7 @@ public class ReviewService {
     }
 
     public void deleteLike(int idReview, int idUser) {
-        dbReviewStorage.deleteLike(idReview,idUser);
+        dbReviewStorage.deleteLike(idReview, idUser);
     }
 
 }

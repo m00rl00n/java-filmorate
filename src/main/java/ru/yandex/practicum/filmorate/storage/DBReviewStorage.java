@@ -9,12 +9,17 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.UserEvent;
+import ru.yandex.practicum.filmorate.storage.user.EventStorage;
 
-
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,16 +28,13 @@ import java.util.List;
 @Primary
 @RequiredArgsConstructor
 public class DBReviewStorage implements ReviewStorage {
-
+    private final Logger log = LoggerFactory.getLogger(DBReviewStorage.class);
     @Autowired
     private final ReviewMapper reviewMapper;
-
-    private final Logger log = LoggerFactory.getLogger(DBReviewStorage.class);
-
     @Autowired
     private final JdbcTemplate jdbcTemplate;
-
-
+    @Autowired
+    private final EventStorage eventStorage;
 
     @Override
     public Review add(Review review) {
@@ -48,6 +50,13 @@ public class DBReviewStorage implements ReviewStorage {
         } catch (DataIntegrityViolationException e) {
             throw new NotFoundException("Не найден пользователь или фильм");
         }
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                review.getUserId(),
+                EventType.REVIEW,
+                Operation.ADD,
+                review.getReviewId()));
         return review;
     }
 
@@ -60,20 +69,40 @@ public class DBReviewStorage implements ReviewStorage {
         if (jdbcTemplate.update(sqlQuery,
                 review.getContent(),
                 review.isPositive(),
-                review.getReviewId()) > 0) {
-            return getById(review.getReviewId());
-        } else {
+                review.getReviewId()) == 0) {
             throw new NotFoundException("Отзыв для обновления отсутствует");
         }
+        Review updated = getById(review.getReviewId());
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                updated.getUserId(),
+                EventType.REVIEW,
+                Operation.UPDATE,
+                review.getReviewId()));
+        return updated;
     }
 
     @Override
     public void delete(int id) {
         log.info("Удаление отзыва");
+        String getSqlQuery = "SELECT * FROM reviews WHERE id = ?";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(getSqlQuery, id);
         String sqlQuery = "DELETE FROM reviews WHERE id = ?";
         if (jdbcTemplate.update(sqlQuery, id) == 0) {
             throw new NotFoundException("Отзыв для удаления отсутствует");
         }
+        Integer userId = null;
+        if (rowSet.next()) {
+            userId = rowSet.getInt("id_user");
+        }
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                userId,
+                EventType.REVIEW,
+                Operation.REMOVE,
+                id));
     }
 
     @Override
@@ -130,7 +159,7 @@ public class DBReviewStorage implements ReviewStorage {
                 idReview,
                 idUser,
                 rate) == 0) {
-           throw new NotFoundException("Отзыв для обновления отсутствует");
+            throw new NotFoundException("Отзыв для обновления отсутствует");
         }
     }
 
