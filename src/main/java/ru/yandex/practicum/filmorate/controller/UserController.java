@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -14,12 +16,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+    private final EventService eventService;
 
     @Autowired
-    public UserController(UserService service) {
-        this.userService = service;
+    public UserController(UserService userService,
+                          EventService eventService) {
+        this.userService = userService;
+        this.eventService = eventService;
     }
 
     @PostMapping
@@ -40,6 +44,11 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUser(@PathVariable("id") Integer id) {
         return userService.getUser(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<UserEvent> getEvents(@PathVariable("id") Integer userId) {
+        return eventService.findByUserId(userId);
     }
 
     @PutMapping("/{userId}/friends/{friendId}")

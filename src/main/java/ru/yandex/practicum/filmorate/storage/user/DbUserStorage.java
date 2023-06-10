@@ -12,9 +12,13 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 
 import java.sql.PreparedStatement;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,6 +32,8 @@ public class DbUserStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     @Autowired
     private final UserMapper userMapper;
+    @Autowired
+    private final EventStorage eventStorage;
 
     @Override
     public User addUser(User user) {
@@ -68,11 +74,9 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public List<User> getUsers() {
-
         String sql = "select * from users";
         log.info("Получение всех пользователей......");
         return jdbcTemplate.query(sql, userMapper);
-
     }
 
 
@@ -103,6 +107,13 @@ public class DbUserStorage implements UserStorage {
         String sql = "INSERT INTO friends (id_user, friend_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, userId, friendId);
         log.info("Друг добавлен");
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                userId,
+                EventType.FRIEND,
+                Operation.ADD,
+                friendId));
     }
 
     public void deleteFriend(Integer userId, Integer friendId) {
@@ -111,6 +122,14 @@ public class DbUserStorage implements UserStorage {
         String sql = "DELETE FROM friends WHERE id_user = ? AND friend_id = ?";
         jdbcTemplate.update(sql, userId, friendId);
         log.info("Друг удален");
+
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                userId,
+                EventType.FRIEND,
+                Operation.REMOVE,
+                friendId));
     }
 
     @Override

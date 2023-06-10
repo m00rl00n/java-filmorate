@@ -12,12 +12,12 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.FilmMapper;
-import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.user.DbUserStorage;
+import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.storage.user.EventStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.sql.PreparedStatement;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,7 +32,9 @@ public class DbFilmStorage implements FilmStorage {
     @Autowired
     private final FilmMapper filmMapper;
     @Autowired
-    private final DbUserStorage dbUserStorage;
+    private final UserStorage dbUserStorage;
+    @Autowired
+    private final EventStorage eventStorage;
 
     @Override
     public Film addFilm(Film film) {
@@ -105,6 +107,13 @@ public class DbFilmStorage implements FilmStorage {
         String sql = "insert into likes (id_films, id_user)" + "values(?, ?)";
 
         jdbcTemplate.update(sql, filmId, userId);
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                userId,
+                EventType.LIKE,
+                Operation.ADD,
+                filmId));
     }
 
     public void deleteLike(Integer filmId, Integer userId) {
@@ -113,6 +122,13 @@ public class DbFilmStorage implements FilmStorage {
         String sql = "delete from likes where id_films = ? and id_user = ?";
 
         jdbcTemplate.update(sql, filmId, userId);
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                userId,
+                EventType.LIKE,
+                Operation.REMOVE,
+                filmId));
     }
 
     public List<Integer> getLikes(Integer filmId) {

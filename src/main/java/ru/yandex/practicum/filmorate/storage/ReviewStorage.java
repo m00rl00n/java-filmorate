@@ -15,7 +15,7 @@ public interface ReviewStorage {
 
     Review getById(int id);
 
-    List<Review> getByIdFilm(int idFilm,int count);
+    List<Review> getByIdFilm(int idFilm, int count);
 
     List<Review> getReviews();
 

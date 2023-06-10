@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
-
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.ResultSet;
@@ -21,6 +20,6 @@ public class ReviewMapper implements RowMapper<Review> {
         int useful = rs.getInt("EVALUATION_SUM");
         int userId = rs.getInt("id_user");
         int filmId = rs.getInt("id_film");
-        return new Review(reviewId, content, isPositive,  useful, userId, filmId);
+        return new Review(reviewId, content, isPositive, useful, userId, filmId);
     }
 }

@@ -48,7 +48,7 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews")
-    public ResponseEntity<List<Review>> getReviewsByFilmID(@RequestParam(required = false,defaultValue = "0") int filmId, @RequestParam(required = false,defaultValue = "0") int count) {
+    public ResponseEntity<List<Review>> getReviewsByFilmID(@RequestParam(required = false, defaultValue = "0") int filmId, @RequestParam(required = false, defaultValue = "0") int count) {
         log.info("Получение отзывов");
         return new ResponseEntity<List<Review>>(reviewService.getByIdFilm(filmId, count), HttpStatus.OK);
     }
@@ -56,25 +56,25 @@ public class ReviewController {
     @PutMapping("/reviews/{id}/like/{userId}")
     public void setLike(@PathVariable @Positive(message = "id отзыва не положительное число") int id, @PathVariable @Positive(message = "userId отзыва не положительное число") int userId) {
         log.info("Установка лайка");
-        reviewService.setLike(id,userId,true);
+        reviewService.setLike(id, userId, true);
     }
 
     @PutMapping("/reviews/{id}/dislike/{userId}")
     public void setDislike(@PathVariable @Positive(message = "id отзыва не положительное число") int id, @PathVariable @Positive(message = "userId отзыва не положительное число") int userId) {
         log.info("Установка дизлайка");
-        reviewService.setLike(id,userId,false);
+        reviewService.setLike(id, userId, false);
     }
 
     @DeleteMapping("/reviews/{id}/like/{userId}")
     public void deleteLike(@PathVariable @Positive(message = "id отзыва не положительное число") int id, @PathVariable @Positive(message = "userId отзыва не положительное число") int userId) {
         log.info("Удаление дизлайка");
-        reviewService.deleteLike(id,userId);
+        reviewService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/reviews/{id}/dislike/{userId}")
     public void deleteDislike(@PathVariable @Positive(message = "id отзыва не положительное число") int id, @PathVariable @Positive(message = "userId отзыва не положительное число") int userId) {
         log.info("Установка дизлайка");
-        reviewService.deleteLike(id,userId);
+        reviewService.deleteLike(id, userId);
     }
 
 }
