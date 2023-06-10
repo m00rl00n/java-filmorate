@@ -104,7 +104,7 @@ public class DbFilmStorage implements FilmStorage {
     public void likeFilm(Integer filmId, Integer userId) {
         dbUserStorage.getUser(userId);
         getFilm(filmId);
-        String sql = "insert into likes (id_films, id_user)" + "values(?, ?)";
+        String sql = "merge into likes (id_films, id_user) key (id_films, id_user) values(?, ?)";
 
         jdbcTemplate.update(sql, filmId, userId);
         eventStorage.add(new UserEvent(
@@ -259,7 +259,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmsByTitleParam(String title) {
-        String sql = "SELECT * FROM films f " +
+        String sql = "SELECT f.* FROM films f " +
                 "LEFT JOIN likes l ON f.id = l.id_films " +
                 "WHERE f.name ILIKE '%' || ? || '%' " +
                 "GROUP BY f.id " +
@@ -269,7 +269,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmByDirectorParam(String director) {
-        String sql = "SELECT * FROM films f " +
+        String sql = "SELECT f.* FROM films f " +
                 "left join film_director fd on fd.id_film = f.id " +
                 "left join directors d on d.id = fd.id_director " +
                 "LEFT JOIN likes l ON f.id = l.id_films " +
@@ -281,7 +281,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getFilmByBothParams(String param) {
-        String sql = "SELECT * FROM films f " +
+        String sql = "SELECT f.* FROM films f " +
                 "left join film_director fd on fd.id_film = f.id " +
                 "left join directors d on d.id = fd.id_director " +
                 "LEFT JOIN likes l ON f.id = l.id_films " +
