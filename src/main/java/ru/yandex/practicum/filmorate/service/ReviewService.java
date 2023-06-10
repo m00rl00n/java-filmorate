@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -8,24 +10,30 @@ import ru.yandex.practicum.filmorate.storage.DBReviewStorage;
 import java.util.List;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ReviewService {
 
     @Autowired
-    DBReviewStorage dbReviewStorage;
+    private final DBReviewStorage dbReviewStorage;
 
     public Review add(Review review) {
+        log.info("Создание отзыва");
         return dbReviewStorage.add(review);
     }
 
     public Review edit(Review review) {
+        log.info("Обновление отзыва");
         return dbReviewStorage.edit(review);
     }
 
     public void delete(int id) {
+        log.info("Удаление отзыва");
         dbReviewStorage.delete(id);
     }
 
     public Review getById(int id) {
+        log.info("Получение отзыва");
         return dbReviewStorage.getById(id);
     }
 
@@ -34,6 +42,7 @@ public class ReviewService {
     }
 
     public List<Review> getByIdFilm(int idFilm, int count) {
+        log.info("Получение отзывов");
         if (idFilm == 0 && count == 0) {
             return dbReviewStorage.getReviews();
         } else {
