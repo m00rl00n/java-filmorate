@@ -162,7 +162,6 @@ public class DbUserStorage implements UserStorage {
         if (findIdUser.next()) {
             similarUserId = findIdUser.getInt("id_user");
         }
-        System.out.println();
         return similarUserId;
     }
 
