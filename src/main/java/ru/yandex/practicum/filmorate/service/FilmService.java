@@ -14,6 +14,8 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
+    private static final String PARAM_DIRECTOR = "director";
+    private static final String PARAM_TITLE = "title";
     @Autowired
     private final DbFilmStorage dbFilmStorage;
 
@@ -60,10 +62,14 @@ public class FilmService {
 
 
     public List<Film> searchWithParams(String text, List<String> params) {
-        boolean hasDirector = params.contains("director");
-        boolean hasTitle = params.contains("title");
-        if (hasDirector && !hasTitle) return dbFilmStorage.getFilmByDirectorParam(text);
-        if (hasTitle && !hasDirector) return dbFilmStorage.getFilmsByTitleParam(text);
+        boolean hasDirector = params.contains(PARAM_DIRECTOR);
+        boolean hasTitle = params.contains(PARAM_TITLE);
+        if (hasDirector && !hasTitle) {
+            return dbFilmStorage.getFilmByDirectorParam(text);
+        }
+        if (hasTitle && !hasDirector) {
+            return dbFilmStorage.getFilmsByTitleParam(text);
+        }
         return dbFilmStorage.getFilmByBothParams(text);
     }
 
