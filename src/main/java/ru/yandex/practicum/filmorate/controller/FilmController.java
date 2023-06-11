@@ -79,7 +79,7 @@ public class FilmController {
                                       @RequestParam(required = false) String sortBy) {
         SortByOption sortByOption = SortByOption.fromValue(sortBy);
 
-        List<Film> list = filmService.getByDirectorId(id, sortByOption.getValue());
+        List<Film> list = filmService.getByDirectorId(id, sortByOption.getValues());
         if (list.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }

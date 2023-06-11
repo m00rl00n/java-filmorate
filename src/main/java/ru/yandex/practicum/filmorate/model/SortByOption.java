@@ -13,7 +13,7 @@ public enum SortByOption {
         this.value = value;
     }
 
-    public String getValue() {
+    public String getValues() {
         return value;
     }
 
