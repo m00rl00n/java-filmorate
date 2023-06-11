@@ -2,8 +2,11 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SortByOption;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -36,6 +39,11 @@ public class FilmController {
         return filmService.getAllFilm();
     }
 
+    @DeleteMapping("/{filmId}")
+    public void deleteFilm(@PathVariable("filmId") Integer id) {
+        filmService.removeFilm(id);
+    }
+
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable int id) {
         return filmService.getFilm(id);
@@ -52,14 +60,44 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
-        return filmService.getMostPopular(count);
+    public List<Film> getPopularFilms(
+            @RequestParam(name = "count",
+                    defaultValue = "10", required = false) Integer count,
+            @RequestParam(name = "genreId", required = false) Integer genreId,
+            @RequestParam(name = "year", required = false) Integer year
+    ) {
+        return filmService.getTopLikedFilms(count, genreId, year);
     }
 
     @GetMapping("/{id}/like")
     public List<Integer> getLikes(Integer count) {
         return filmService.getLikes(count);
     }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getByDirectorId(@PathVariable("directorId") Integer id,
+                                      @RequestParam(required = false) String sortBy) {
+        SortByOption sortByOption = SortByOption.fromValue(sortBy);
+
+        List<Film> list = filmService.getByDirectorId(id, sortByOption.getValues());
+        if (list.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return list;
+    }
+
+
+    @GetMapping("/search")
+    public List<Film> getBySearchParameters(@RequestParam String query,
+                                            @RequestParam List<String> by) {
+        return filmService.searchWithParams(query, by);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam("userId") Integer userId, @RequestParam("friendId") Integer friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
 }
+
 
 

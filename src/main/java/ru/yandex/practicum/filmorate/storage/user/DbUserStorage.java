@@ -4,17 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 
 import java.sql.PreparedStatement;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,16 +32,14 @@ public class DbUserStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     @Autowired
     private final UserMapper userMapper;
-
+    @Autowired
+    private final EventStorage eventStorage;
 
     @Override
     public User addUser(User user) {
         validateUser(user);
         if (user == null) {
             throw new ValidationException("Нужно добавить пользователя");
-        }
-        if (user.getName() == null) {
-            user.setName(user.getLogin());
         }
         KeyHolder keyHolder = new GeneratedKeyHolder();
         String sql = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
@@ -72,31 +74,32 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public List<User> getUsers() {
-
         String sql = "select * from users";
         log.info("Получение всех пользователей......");
         return jdbcTemplate.query(sql, userMapper);
-
     }
 
+
     @Override
-    public User getUser(Integer userId) {
-        try {
-            String sql = "select * from users where  id = ?";
-            return jdbcTemplate.queryForObject(sql, userMapper, userId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Пользователь с айди " + userId + " не найден");
+    public User getUser(Integer id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        List<User> users = jdbcTemplate.query(sql, userMapper, id);
+        if (users.isEmpty()) {
+            throw new NotFoundException("Пользователь с айди " + id + " не найден");
         }
+        return users.get(0);
     }
 
     @Override
-    public void deleteUser(Integer userId) {
-        getUser(userId);
-        String sql = "DELETE FROM users WHERE id = ?";
-        jdbcTemplate.update(sql, userId);
-        log.info("Пользователь с айди " + userId + " удален");
-    }
+    public void deleteUser(Integer id) {
+        getUser(id);
+        String deleteFriendsQuery = "DELETE FROM friends WHERE id_user = ? OR friend_id = ?";
+        jdbcTemplate.update(deleteFriendsQuery, id, id);
+        String deleteUserQuery = "DELETE FROM users WHERE id = ?";
+        jdbcTemplate.update(deleteUserQuery, id);
 
+        log.info("Пользователь удален");
+    }
 
     public void addFriend(Integer userId, Integer friendId) {
         getUser(userId);
@@ -104,6 +107,13 @@ public class DbUserStorage implements UserStorage {
         String sql = "INSERT INTO friends (id_user, friend_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, userId, friendId);
         log.info("Друг добавлен");
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                userId,
+                EventType.FRIEND,
+                Operation.ADD,
+                friendId));
     }
 
     public void deleteFriend(Integer userId, Integer friendId) {
@@ -112,6 +122,14 @@ public class DbUserStorage implements UserStorage {
         String sql = "DELETE FROM friends WHERE id_user = ? AND friend_id = ?";
         jdbcTemplate.update(sql, userId, friendId);
         log.info("Друг удален");
+
+        eventStorage.add(new UserEvent(
+                null,
+                Instant.now().toEpochMilli(),
+                userId,
+                EventType.FRIEND,
+                Operation.REMOVE,
+                friendId));
     }
 
     @Override
@@ -133,6 +151,18 @@ public class DbUserStorage implements UserStorage {
                 "WHERE f.id_user = ? " +
                 "AND f.friend_id IN (SELECT friend_id FROM friends WHERE id_user = ?)";
         return jdbcTemplate.query(sql, userMapper, userId, otherId);
+    }
+
+    public Integer getIdUserWithMostOverlappingLikes(int userId) {
+        Integer similarUserId = null;
+        SqlRowSet findIdUser = jdbcTemplate.queryForRowSet(
+                "SELECT id_user, COUNT(id_user) as films_intersect_n FROM likes " +
+                        "WHERE id_films IN (SELECT id_films FROM likes WHERE id_user = ?) AND id_user != ? " +
+                        "GROUP BY id_user ORDER BY films_intersect_n desc LIMIT 1", userId, userId);
+        if (findIdUser.next()) {
+            similarUserId = findIdUser.getInt("id_user");
+        }
+        return similarUserId;
     }
 
     public void validateUser(User user) {

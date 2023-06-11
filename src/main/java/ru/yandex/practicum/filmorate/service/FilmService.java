@@ -10,13 +10,14 @@ import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
 import java.util.List;
 
 
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
+    private static final String PARAM_DIRECTOR = "director";
+    private static final String PARAM_TITLE = "title";
     @Autowired
-    private  final DbFilmStorage dbFilmStorage;
+    private final DbFilmStorage dbFilmStorage;
 
 
     public Film addFilm(Film film) {
@@ -45,14 +46,43 @@ public class FilmService {
         dbFilmStorage.deleteLike(id, userId);
     }
 
+    public void removeFilm(Integer id) {
+        log.info("Удаление фильма с айди " + id);
+        dbFilmStorage.deleteFilm(id);
+    }
+
     public List<Integer> getLikes(Integer count) {
         return dbFilmStorage.getLikes(count);
     }
 
-    public List<Film> getMostPopular(int max) {
-        return dbFilmStorage.sortByLikes(max);
+
+    public List<Film> getByDirectorId(Integer directorId, String sortBy) {
+        return dbFilmStorage.findByDirectorId(directorId, sortBy);
     }
 
 
+    public List<Film> searchWithParams(String text, List<String> params) {
+        boolean hasDirector = params.contains(PARAM_DIRECTOR);
+        boolean hasTitle = params.contains(PARAM_TITLE);
+        if (hasDirector && !hasTitle) {
+            return dbFilmStorage.getFilmByDirectorParam(text);
+        }
+        if (hasTitle && !hasDirector) {
+            return dbFilmStorage.getFilmsByTitleParam(text);
+        }
+        return dbFilmStorage.getFilmByBothParams(text);
+    }
+
+    public List<Film> getTopLikedFilms(Integer count, Integer genreId, Integer year) {
+        return dbFilmStorage.sortByLikes(count, genreId, year);
+    }
+
+
+    public List<Film> getCommonFilms(Integer userId, Integer friendId) {
+        return dbFilmStorage.getCommonFilms(userId, friendId);
+    }
+
 }
+
+
 
